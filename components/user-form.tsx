@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button, SubmitButton } from '@/components/ui/button';
+import { Input, FormField } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Card,
@@ -45,9 +45,12 @@ export function UserForm() {
 
       // Reset form
       (e.target as HTMLFormElement).reset();
-      
+
       // Refresh the page to show new user in server component list
       router.refresh();
+
+      // Clear any previous errors
+      setError(null);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -56,71 +59,49 @@ export function UserForm() {
   }
 
   return (
-    <Card className="w-full border-muted/40 shadow-xl transition-all hover:shadow-2xl dark:bg-zinc-950/50 backdrop-blur-sm">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-          <UserPlus className="h-5 w-5 text-indigo-500" />
-          Add New User
+        <CardTitle className="flex items-center gap-2">
+          <UserPlus className="h-5 w-5" />
+          Create User
         </CardTitle>
-        <CardDescription>
-          Join our platform by entering your details below.
-        </CardDescription>
+        <CardDescription>Add a new user to your account</CardDescription>
       </CardHeader>
-      <form onSubmit={onSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Full Name
-            </Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="name"
-                name="name"
-                placeholder="John Doe"
-                required
-                className="pl-9 transition-all focus:ring-2 focus:ring-indigo-500/20"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Email Address
-            </Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="john@example.com"
-                required
-                className="pl-9 transition-all focus:ring-2 focus:ring-indigo-500/20"
-              />
-            </div>
-          </div>
-          {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-xs font-medium text-destructive animate-in fade-in slide-in-from-top-1">
-              {error}
-            </div>
-          )}
-        </CardContent>
-        <CardFooter>
-          <Button 
-            disabled={loading} 
-            className="w-full bg-indigo-600 font-semibold text-white shadow-md transition-all hover:bg-indigo-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-70"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              'Create User'
-            )}
-          </Button>
-        </CardFooter>
-      </form>
+      <CardContent>
+        <form className="space-y-4" onSubmit={onSubmit}>
+          <FormField
+            label="Name"
+            name="name"
+            placeholder="John Doe"
+            error={error}
+            required
+          />
+          <FormField
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="john@example.com"
+            error={error}
+            required
+          />
+          <CardFooter className="flex justify-end pt-0">
+            <SubmitButton loading={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Create User
+                </>
+              )}
+            </SubmitButton>
+          </CardFooter>
+        </form>
+      </CardContent>
     </Card>
   );
+}
 }
