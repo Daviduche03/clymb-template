@@ -126,4 +126,19 @@
   html {
     @apply font-sans;
     }
+  body {
+    font-feature-settings: "ss01" 1, "cv01" 1, "cv11" 1;
+    letter-spacing: -0.01em;
+  }
+  [data-store-theme] h1,
+  [data-store-theme] h2,
+  [data-store-theme] h3,
+  [data-store-theme] h4,
+  [data-store-theme] h5,
+  [data-store-theme] h6 {
+    letter-spacing: -0.035em;
+  }
+  [data-store-theme] {
+    --radius: 0.25rem;
+  }
 }

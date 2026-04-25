@@ -28,7 +28,12 @@ const Combobox = <T,>({
     return options.filter((option) =>
       labelExtractor(option).toLowerCase().includes(query.toLowerCase())
     )
-  }, [options, query])
+  }, [labelExtractor, options, query])
+
+  const selectedLabel = React.useMemo(() => {
+    const selectedOption = options.find((option) => valueExtractor(option) === value)
+    return selectedOption ? labelExtractor(selectedOption) : placeholder
+  }, [labelExtractor, options, placeholder, value, valueExtractor])
 
   return (
     <div className="relative">
@@ -38,9 +43,7 @@ const Combobox = <T,>({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <span className="truncate">
-          {options.find((option) => valueExtractor(option) === value)?.label || placeholder}
-        </span>
+        <span className="truncate">{selectedLabel}</span>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </button>
       {isOpen && (

@@ -12,6 +12,8 @@
   },
   "iconLibrary": "hugeicons",
   "rtl": false,
+  "menuColor": "inverted-translucent",
+  "menuAccent": "subtle",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
@@ -19,7 +21,8 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "menuColor": "inverted-translucent",
-  "menuAccent": "subtle",
-  "registries": {}
+  "registries": {
+    "@ss-blocks": "https://shadcnstudio.com/r/{name}.json",
+    "@commercn": "https://commercn.com/r/{name}.json"
+  }
 }

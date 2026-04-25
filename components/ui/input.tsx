@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import { Label } from "@/components/ui/label"
+
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string
 }
@@ -18,4 +20,36 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, error
 ))
 Input.displayName = "Input"
 
-export { Input }
+export interface FormFieldProps {
+  label: string
+  name: string
+  placeholder?: string
+  error?: string | null
+  required?: boolean
+  type?: React.HTMLInputTypeAttribute
+}
+
+function FormField({
+  label,
+  name,
+  placeholder,
+  error,
+  required,
+  type = "text",
+}: FormFieldProps) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
+        id={name}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+        error={error ?? undefined}
+      />
+    </div>
+  )
+}
+
+export { Input, FormField }

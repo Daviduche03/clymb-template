@@ -1,16 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@/components/ui/button"
 
 interface NavigationItem {
   label: string
   href?: string
   icon?: React.ReactNode
-}
-
-interface AppSidebarProps {
-  navigation: NavigationItem[]
 }
 
 const AppSidebar = () => {

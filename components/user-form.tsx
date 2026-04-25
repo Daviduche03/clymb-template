@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, SubmitButton } from '@/components/ui/button';
-import { Input, FormField } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { FormField } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -13,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { UserPlus, Loader2, Mail, User } from 'lucide-react';
+import { UserPlus, Loader2 } from 'lucide-react';
 
 export function UserForm() {
   const router = useRouter();
@@ -51,8 +50,8 @@ export function UserForm() {
 
       // Clear any previous errors
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create user');
     } finally {
       setLoading(false);
     }
@@ -85,7 +84,7 @@ export function UserForm() {
             required
           />
           <CardFooter className="flex justify-end pt-0">
-            <SubmitButton loading={loading}>
+            <Button type="submit" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -97,11 +96,10 @@ export function UserForm() {
                   Create User
                 </>
               )}
-            </SubmitButton>
+            </Button>
           </CardFooter>
         </form>
       </CardContent>
     </Card>
   );
-}
 }
