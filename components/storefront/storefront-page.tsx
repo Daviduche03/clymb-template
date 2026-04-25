@@ -2,6 +2,7 @@ import { PromoBannerOne } from "@/components/commercn/promo-banners/promo-banner
 import { PromoBannerThree } from "@/components/commercn/promo-banners/promo-banner-03"
 import { StorefrontExperience } from "@/components/storefront/storefront-experience"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
+import { HeroSectionEditorial } from "@/components/storefront/hero-section-editorial"
 import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import HeroSection01 from "@/components/shadcn-studio/blocks/hero-section-01/hero-section-01"
 import HeroSection41 from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
@@ -37,6 +38,7 @@ const hero41MenuData: MenuData[] = [
 
 import Footer01 from "@/components/shadcn-studio/blocks/footer-component-01/footer-component-01"
 import Footer02 from "@/components/shadcn-studio/blocks/footer-component-01/footer-component-02"
+import Footer03 from "@/components/shadcn-studio/blocks/footer-component-01/footer-component-03"
 
 function HeroSectionVariant({ store }: { store: StorefrontConfig }) {
   if (store.variants.hero === "hero-section-01") {
@@ -59,6 +61,17 @@ function HeroSectionVariant({ store }: { store: StorefrontConfig }) {
           description={store.heroDescription}
         />
       </section>
+    )
+  }
+
+  if (store.variants.hero === "hero-editorial") {
+    return (
+      <HeroSectionEditorial
+        badge={store.heroBadge}
+        title={store.heroTitle}
+        description={store.heroDescription}
+        image={store.heroImage}
+      />
     )
   }
 
@@ -93,6 +106,9 @@ function FooterVariant({ store, basePath }: { store: StorefrontConfig; basePath:
 
   if (store.variants.footer === "footer-02") {
     return <Footer02 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} cartHref={cartHref} />
+  }
+  if (store.variants.footer === "footer-03") {
+    return <Footer03 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} cartHref={cartHref} />
   }
   return <Footer01 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} />
 }

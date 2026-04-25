@@ -17,12 +17,12 @@ export type StoreCategory = {
 
 export type StorefrontVariants = {
   banner: "none" | "promo-01" | "promo-03"
-  hero: "custom" | "hero-section-01" | "hero-section-41"
-  categories: "cards" | "list" | "circle"
-  productCards: "none" | "product-card-01" | "product-card-02" | "product-card-03" | "both"
+  hero: "custom" | "hero-section-01" | "hero-section-41" | "hero-editorial"
+  categories: "cards" | "list" | "circle" | "split"
+  productCards: "none" | "product-card-01" | "product-card-02" | "product-card-03" | "product-card-04" | "both"
   productDetails: "dialog" | "route" | "both"
   cart: "dialog" | "route" | "both"
-  footer: "footer-01" | "footer-02"
+  footer: "footer-01" | "footer-02" | "footer-03"
 }
 
 export type StoreTheme = {
@@ -236,12 +236,12 @@ export const fitnessWearStore: StorefrontConfig = {
   products: fitnessProducts,
   variants: {
     banner: "promo-01",
-    hero: "hero-section-01",
-    categories: "circle",
-    productCards: "product-card-02",
+    hero: "hero-editorial",
+    categories: "split",
+    productCards: "product-card-04",
     productDetails: "route",
     cart: "route",
-    footer: "footer-02",
+    footer: "footer-03",
   },
 }
 

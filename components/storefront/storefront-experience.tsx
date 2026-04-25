@@ -5,11 +5,13 @@ import { useCallback, useMemo, useState } from "react"
 import { CategoryCard } from "@/components/commercn/categories/category-01"
 import { CategoryListCard } from "@/components/commercn/categories/category-02"
 import { CategoryFour } from "@/components/commercn/categories/category-04"
+import { ProductCardFour } from "@/components/commercn/product-cards/product-card-04"
 import { ProductCardOne } from "@/components/commercn/product-cards/product-card-01"
 import { ProductCardTwo } from "@/components/commercn/product-cards/product-card-02"
 import { ProductCardThree } from "@/components/commercn/product-cards/product-card-03"
 import { ProductDetailOne } from "@/components/commercn/product-details/product-detail-01"
 import { ShoppingCartOne } from "@/components/commercn/carts/cart-01"
+import { CategorySectionSplit } from "@/components/storefront/category-section-split"
 import ProductList from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -224,6 +226,13 @@ export function StorefrontExperience({
               }))} 
             />
           )}
+
+          {config.variants.categories === "split" && (
+            <CategorySectionSplit
+              categories={config.categories}
+              onSelect={(category) => activateCategory(categoryTagByTitle.get(category.title) ?? null)}
+            />
+          )}
         </div>
       </section>
 
@@ -273,6 +282,9 @@ export function StorefrontExperience({
                     <ProductCardThree {...cardProps} />
                   </div>
                 )
+              }
+              if (config.variants.productCards === "product-card-04") {
+                return <ProductCardFour key={p.slug} {...cardProps} />
               }
               return <ProductCardTwo key={p.slug} {...cardProps} />
             })}
