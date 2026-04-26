@@ -50,8 +50,8 @@ export function CartPageClient({
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-              <div className="flex flex-col gap-4">
+            <div className={store.variants.cartStyle === "minimal" ? "grid grid-cols-1 gap-8 lg:grid-cols-[1.1fr_0.9fr]" : "grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]"}>
+              <div className={store.variants.cartStyle === "minimal" ? "grid gap-4 md:grid-cols-2" : "flex flex-col gap-4"}>
                 {cartLines.map((line) => (
                   <ShoppingCartOne
                     key={line.id}
@@ -62,7 +62,7 @@ export function CartPageClient({
                 ))}
               </div>
 
-              <div className="h-fit rounded-2xl bg-zinc-100 p-5">
+              <div className={store.variants.cartStyle === "minimal" ? "h-fit border border-zinc-200 bg-[var(--store-panel)] p-6" : "h-fit rounded-2xl bg-zinc-100 p-5"}>
                 <h2 className="text-lg font-semibold">Order Summary</h2>
                 <div className="mt-4 space-y-2 text-sm text-zinc-700">
                   <div className="flex items-center justify-between">
@@ -83,7 +83,7 @@ export function CartPageClient({
                   <span>Total</span>
                   <span>${cartTotal.toFixed(2)}</span>
                 </div>
-                <Button className="mt-5 w-full" size="lg" asChild>
+                <Button className={store.variants.cartStyle === "minimal" ? "mt-5 h-12 w-full rounded-none text-xs uppercase tracking-[0.22em]" : "mt-5 w-full"} size="lg" asChild>
                   <Link href={`${basePath}/checkout`}>Proceed to checkout</Link>
                 </Button>
               </div>

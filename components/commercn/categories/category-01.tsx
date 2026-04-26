@@ -108,7 +108,7 @@ export function CategoryCard({ title, count, imageSrc, className, onClick }: Cat
 				}
 			}}
 			className={cn(
-				"group relative flex h-64 cursor-pointer flex-col justify-end overflow-hidden bg-[var(--store-panel)] outline-none focus-visible:ring-2 focus-visible:ring-ring",
+				"group relative flex h-56 cursor-pointer flex-col justify-end overflow-hidden rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring",
 				className
 			)}
 		>
@@ -120,14 +120,11 @@ export function CategoryCard({ title, count, imageSrc, className, onClick }: Cat
 				/>
 			</div>
 
-			<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
+			<div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
 
-			<div className="relative flex w-full items-end justify-between gap-4 p-6">
+			<div className="bottom-0 left-0 p-[24px] w-full flex items-end justify-between gap-4 relative">
 				<div className="shrink-0">
-					<p className="mb-2 text-[0.62rem] font-medium uppercase tracking-[0.22em] text-white/80">
-						Collection
-					</p>
-					<h3 className="text-2xl font-semibold tracking-[-0.04em] text-zinc-100">
+					<h3 className="text-zinc-100 text-2xl font-semibold">
 						{title}
 					</h3>
 					<p className="text-white/90 font-medium text-sm">
@@ -137,7 +134,7 @@ export function CategoryCard({ title, count, imageSrc, className, onClick }: Cat
 
 
 				<div
-					className="flex h-10 w-10 items-center justify-center border border-white/70 bg-white/90 text-black opacity-0 translate-y-4 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100"
+					className="w-[32px] h-[32px] bg-white rounded-full flex items-center justify-center text-black opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out"
 				>
 					<ArrowRight className="w-4 h-4" strokeWidth={2} />
 				</div>

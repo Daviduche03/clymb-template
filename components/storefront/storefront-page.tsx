@@ -1,9 +1,9 @@
 import { PromoBannerOne } from "@/components/commercn/promo-banners/promo-banner-01"
 import { PromoBannerThree } from "@/components/commercn/promo-banners/promo-banner-03"
+import { HeroSectionEditorial } from "@/components/storefront/hero-section-editorial"
+import { StorefrontHeader } from "@/components/storefront/storefront-header"
 import { StorefrontExperience } from "@/components/storefront/storefront-experience"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
-import { HeroSectionEditorial } from "@/components/storefront/hero-section-editorial"
-import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import HeroSection01 from "@/components/shadcn-studio/blocks/hero-section-01/hero-section-01"
 import HeroSection41 from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
 import type { MenuData } from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
@@ -65,14 +65,7 @@ function HeroSectionVariant({ store }: { store: StorefrontConfig }) {
   }
 
   if (store.variants.hero === "hero-editorial") {
-    return (
-      <HeroSectionEditorial
-        badge={store.heroBadge}
-        title={store.heroTitle}
-        description={store.heroDescription}
-        image={store.heroImage}
-      />
-    )
+    return <HeroSectionEditorial badge={store.heroBadge} title={store.heroTitle} description={store.heroDescription} image={store.heroImage} />
   }
 
   return (
@@ -128,7 +121,7 @@ export function StorefrontPage({
         {store.variants.banner === "promo-03" ? <PromoBannerThree /> : null}
         {store.variants.banner === "promo-01" ? <PromoBannerOne /> : null}
 
-        <Header navigationData={navigation} logoUrl={store.theme?.logoUrl} homeHref={basePath || "/"} />
+        <StorefrontHeader store={store} navigation={navigation} basePath={basePath} />
         <HeroSectionVariant store={store} />
 
         <StorefrontExperience config={store} basePath={basePath} />

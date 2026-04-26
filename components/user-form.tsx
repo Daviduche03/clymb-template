@@ -51,7 +51,7 @@ export function UserForm() {
       // Clear any previous errors
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create user');
+      setError(err instanceof Error ? err.message : "Failed to create user");
     } finally {
       setLoading(false);
     }

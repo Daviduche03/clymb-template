@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -76,7 +77,7 @@ export interface CategoryListCardProps {
 export function CategoryListCard({ title, count, imageSrc, onClick }: CategoryListCardProps) {
 	return (
 		<Card
-			className="group min-w-0 w-full p-4"
+			className="w-full p-4 group min-w-0"
 			role={onClick ? "button" : undefined}
 			tabIndex={onClick ? 0 : undefined}
 			onClick={onClick}

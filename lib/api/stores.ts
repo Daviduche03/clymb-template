@@ -12,11 +12,15 @@ type StoreSummary = Pick<StorefrontConfig, "id" | "name" | "heroBadge" | "theme"
 
 const defaultVariants: StorefrontVariants = {
   banner: "none",
+  header: "header-01",
   hero: "custom",
   categories: "list",
   productCards: "both",
   productDetails: "dialog",
   cart: "dialog",
+  search: "panel",
+  productPage: "editorial",
+  cartStyle: "standard",
   footer: "footer-01",
 }
 
@@ -113,6 +117,8 @@ function mapStoreFromDb(
   categories: StoreCategory[],
   products: StoreProduct[],
 ): StorefrontConfig {
+  const fallbackStore = fallbackStoreBySlug(store.slug)
+
   return {
     id: store.slug,
     name: store.name,
@@ -129,6 +135,7 @@ function mapStoreFromDb(
       primaryColor: store.primaryColor ?? undefined,
       accentColor: store.accentColor ?? undefined,
     },
+    sections: fallbackStore?.sections,
     categories,
     products,
   }
