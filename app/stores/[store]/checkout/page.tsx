@@ -21,6 +21,7 @@ export default function CheckoutPage({
   const [address, setAddress] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [idempotencyKey] = useState(() => crypto.randomUUID())
 
   const cartLinesArray = useMemo(() => Object.values(lines), [lines])
 
@@ -44,6 +45,8 @@ export default function CheckoutPage({
       storeSlug: store,
       lines: cartLinesArray,
       customerEmail: email,
+      shippingAddress: address,
+      idempotencyKey,
     })
 
     if (result.success && result.orderId) {

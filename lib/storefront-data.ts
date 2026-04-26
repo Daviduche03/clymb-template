@@ -453,5 +453,6 @@ export function toCartLine(product: StoreProduct, quantity: number): ShoppingCar
     image: product.image,
     price: product.salePrice ?? product.price,
     quantity,
+    currency: product.detail?.currency ?? "$",
   }
 }

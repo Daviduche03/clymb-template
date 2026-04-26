@@ -94,7 +94,7 @@ async function main() {
       // Sync products
       if (store.products && store.products.length > 0) {
         await db.delete(schema.storeProducts).where(eq(schema.storeProducts.storeId, storeId));
-        await db.insert(schema.storeProducts).values(
+        const insertedProducts = await db.insert(schema.storeProducts).values(
           store.products.map((p) => {
             const currentPrice = p.detail?.currentPrice ?? p.salePrice ?? p.price;
             const originalPrice = p.detail?.compareAtPrice ?? p.price;
@@ -114,8 +114,44 @@ async function main() {
               sizes: p.detail?.sizes ?? [],
               currency: p.detail?.currency ?? "$",
               stockMessage: p.detail?.stockMessage,
+              inventory: p.inventory ?? 0,
+              active: true,
             };
           })
+        ).returning({
+          id: schema.storeProducts.id,
+          slug: schema.storeProducts.slug,
+          currency: schema.storeProducts.currency,
+        });
+
+        await db.insert(schema.productVariants).values(
+          insertedProducts.map((product) => {
+            const sourceProduct = store.products.find((entry) => entry.slug === product.slug);
+            const unitPrice =
+              sourceProduct?.detail?.currentPrice ??
+              sourceProduct?.salePrice ??
+              sourceProduct?.price ??
+              0;
+            const compareAtPrice =
+              sourceProduct?.detail?.compareAtPrice ??
+              (sourceProduct?.salePrice != null ? sourceProduct.price : undefined);
+            const optionValues = sourceProduct?.detail?.sizes?.length
+              ? { size: sourceProduct.detail.sizes[0] }
+              : { title: "Default" };
+
+            return {
+              productId: product.id,
+              sku: `${store.id}-${product.slug}-default`,
+              title: sourceProduct?.detail?.sizes?.[0] ?? "Default",
+              optionValues,
+              price: unitPrice,
+              compareAtPrice,
+              currency: product.currency ?? "$",
+              inventory: sourceProduct?.inventory ?? 0,
+              reserved: 0,
+              active: true,
+            };
+          }),
         );
         console.log(`Seeded products for ${store.name}`);
       }

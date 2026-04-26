@@ -2,7 +2,6 @@
 
 import {
 	Card,
-	CardContent,
 	CardTitle,
 	CardDescription,
 } from "@/components/ui/card"
@@ -27,6 +26,9 @@ export type ShoppingCartLine = {
 	image: string
 	price: number
 	quantity: number
+	variantId?: string
+	sku?: string
+	currency?: string
 }
 
 export type ShoppingCartOneProps = {
