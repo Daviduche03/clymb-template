@@ -125,7 +125,7 @@ async function main() {
         });
 
         await db.insert(schema.productVariants).values(
-          insertedProducts.map((product) => {
+          insertedProducts.flatMap((product) => {
             const sourceProduct = store.products.find((entry) => entry.slug === product.slug);
             const unitPrice =
               sourceProduct?.detail?.currentPrice ??
@@ -135,22 +135,27 @@ async function main() {
             const compareAtPrice =
               sourceProduct?.detail?.compareAtPrice ??
               (sourceProduct?.salePrice != null ? sourceProduct.price : undefined);
-            const optionValues = sourceProduct?.detail?.sizes?.length
-              ? { size: sourceProduct.detail.sizes[0] }
-              : { title: "Default" };
+            const sizes = sourceProduct?.detail?.sizes?.length
+              ? sourceProduct.detail.sizes
+              : ["Default"];
+            const baseInventory = sourceProduct?.inventory ?? 0;
+            const perVariantInventory = sizes.length > 0
+              ? Math.max(0, Math.floor(baseInventory / sizes.length))
+              : baseInventory;
 
-            return {
+            return sizes.map((size, index) => ({
               productId: product.id,
-              sku: `${store.id}-${product.slug}-default`,
-              title: sourceProduct?.detail?.sizes?.[0] ?? "Default",
-              optionValues,
+              sku: `${store.id}-${product.slug}-${String(size).toLowerCase().replace(/\s+/g, "-")}`,
+              title: size,
+              optionValues: { size },
               price: unitPrice,
               compareAtPrice,
               currency: product.currency ?? "$",
-              inventory: sourceProduct?.inventory ?? 0,
+              // Put any remainder inventory on the first variant.
+              inventory: index === 0 ? perVariantInventory + (baseInventory % sizes.length) : perVariantInventory,
               reserved: 0,
               active: true,
-            };
+            }));
           }),
         );
         console.log(`Seeded products for ${store.name}`);

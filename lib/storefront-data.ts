@@ -445,14 +445,17 @@ export function productToDetailModel(product: StoreProduct): ProductDetailModel 
   }
 }
 
-export function toCartLine(product: StoreProduct, quantity: number): ShoppingCartLine {
+export function toCartLine(product: StoreProduct, quantity: number, variantTitle?: string): ShoppingCartLine {
   return {
     id: product.slug,
     name: product.name,
-    category: product.badges[0] ?? "Wearable",
+    category: variantTitle
+      ? `${product.badges[0] ?? "Wearable"} · ${variantTitle}`
+      : (product.badges[0] ?? "Wearable"),
     image: product.image,
     price: product.salePrice ?? product.price,
     quantity,
+    variantTitle,
     currency: product.detail?.currency ?? "$",
   }
 }

@@ -76,9 +76,9 @@ export function StorefrontExperience({
   const isLowStock = useCallback((product: StoreProduct) => getInventory(product) > 0 && getInventory(product) <= 3, [getInventory])
 
   const addToCart = useCallback(
-    (product: StoreProduct, quantity: number) => {
+    (product: StoreProduct, quantity: number, variantTitle?: string) => {
       if (isOutOfStock(product)) return
-      addToCartBase(toCartLine(product, quantity))
+      addToCartBase(toCartLine(product, quantity, variantTitle))
       if (allowCartDialog) setCartOpen(true)
     },
     [addToCartBase, allowCartDialog, isOutOfStock],
@@ -367,8 +367,8 @@ export function StorefrontExperience({
                 product={detailModel}
                 variant={config.variants.productPage}
                 className="mx-auto max-w-none p-0 sm:p-0"
-                onAddToCart={(quantity) => {
-                  if (selected) addToCart(selected, quantity)
+                onAddToCart={(quantity, size) => {
+                  if (selected) addToCart(selected, quantity, size)
                   setDetailOpen(false)
                 }}
               />
@@ -381,7 +381,7 @@ export function StorefrontExperience({
         <DialogContent className={config.variants.cartStyle === "minimal" ? "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-3xl" : "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-lg"} showCloseButton>
           <DialogHeader>
             <DialogTitle>Your cart</DialogTitle>
-            <DialogDescription>Adjust quantities or remove items. Cart is persisted in localStorage.</DialogDescription>
+            <DialogDescription>Adjust quantities or remove items. Cart syncs with your active server cart session.</DialogDescription>
           </DialogHeader>
           {Object.keys(lines).length === 0 ? (
             <p className="text-muted-foreground text-sm">Your cart is empty. Add any product from the collection.</p>
@@ -417,7 +417,7 @@ function MetricCard({ label, value, description }: { label: string; value: strin
 
 function SearchPanel(props: SearchUiProps) {
   return (
-    <div className="border border-zinc-200 bg-[var(--store-panel)] p-4 sm:p-5">
+    <div className="border border-zinc-200 bg-(--store-panel) p-4 sm:p-5">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h4 className="text-sm font-semibold text-zinc-900 sm:text-base">Search, filter, and sort</h4>
         <p className="text-xs text-zinc-500">{props.filteredCount} results</p>

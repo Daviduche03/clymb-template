@@ -57,12 +57,14 @@ export async function addLineToCart({
   productSlug,
   quantity,
   variantId,
+  variantTitle,
 }: {
   storeSlug: string
   sessionToken: string
   productSlug: string
   quantity: number
   variantId?: string
+  variantTitle?: string
 }) {
   const cart = await getOrCreateCart(storeSlug, sessionToken)
   const normalizedQuantity = normalizeQuantity(quantity)
@@ -83,9 +85,14 @@ export async function addLineToCart({
     where: eq(schema.productVariants.productId, product.id),
   })
 
+  const normalizedVariantTitle = variantTitle?.trim().toLowerCase()
   const selectedVariant = variantId
     ? variants.find((variant) => variant.id === variantId && variant.active)
-    : variants.find((variant) => variant.active)
+    : normalizedVariantTitle
+      ? variants.find(
+          (variant) => variant.active && variant.title.trim().toLowerCase() === normalizedVariantTitle,
+        )
+      : variants.find((variant) => variant.active)
 
   if (!selectedVariant) {
     throw new Error("Variant not found.")
@@ -207,12 +214,16 @@ export async function getCartSnapshot(sessionToken: string): Promise<ServerCartS
       return {
         id: product?.slug ?? item.productId,
         name: product?.name ?? "Unknown product",
-        category: variant?.title ?? product?.category ?? "Item",
+        category:
+          product?.category
+            ? `${product.category}${variant?.title && variant.title !== "Default" ? ` · ${variant.title}` : ""}`
+            : variant?.title ?? "Item",
         image: product?.image ?? "",
         price: item.unitPriceSnapshot,
         quantity: item.quantity,
         variantId: item.variantId ?? undefined,
         sku: variant?.sku ?? undefined,
+        variantTitle: variant?.title ?? undefined,
         currency: item.currency,
       }
     }),

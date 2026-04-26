@@ -52,7 +52,7 @@ const defaultModel: ProductDetailModel = {
 export type ProductDetailOneProps = {
 	/** When omitted, shows the built-in demo product. */
 	product?: ProductDetailModel | null
-	onAddToCart?: (quantity: number) => void
+	onAddToCart?: (quantity: number, size?: string) => void
 	className?: string
 	variant?: "editorial" | "split"
 }
@@ -208,7 +208,7 @@ export function ProductDetailOne({ product, onAddToCart, className, variant = "e
 							type="button"
 							size="lg"
 							onClick={() => {
-								onAddToCart?.(quantity)
+								onAddToCart?.(quantity, selectedSize)
 								if (onAddToCart) setDidAdd(true)
 							}}
 						>

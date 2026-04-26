@@ -27,6 +27,7 @@ export type ShoppingCartLine = {
 	price: number
 	quantity: number
 	variantId?: string
+	variantTitle?: string
 	sku?: string
 	currency?: string
 }
