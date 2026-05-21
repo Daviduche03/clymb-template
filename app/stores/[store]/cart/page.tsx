@@ -7,18 +7,29 @@ import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/use-cart"
-import { mapNavigationForStore, storefronts } from "@/lib/storefront-data"
+import { mapNavigationForStore } from "@/lib/types"
+import type { StorefrontConfig } from "@/lib/types"
+import { useEffect, useState } from "react"
 
 export default function StoreCartPage() {
   const params = useParams<{ store: string }>()
   const storeId = params.store
   const { lines, cartTotal, setLineQty, removeLine, isLoaded } = useCart(storeId)
-  const store = storefronts.find((s) => s.id === storeId) ?? storefronts[0]
+  const [store, setStore] = useState<StorefrontConfig | null>(null)
+
+  useEffect(() => {
+    import("@/lib/api/store-client").then(({ getStorefrontConfig }) => {
+      getStorefrontConfig(storeId).then((config) => {
+        if (config) setStore(config)
+      })
+    })
+  }, [storeId])
+
+  if (!isLoaded || !store) return null
+
   const cartLines = Object.values(lines)
   const lineCount = cartLines.reduce((sum, line) => sum + line.quantity, 0)
   const navigation = mapNavigationForStore(`/stores/${store.id}`, store.navigation)
-
-  if (!isLoaded) return null;
 
   return (
     <StoreThemeProvider config={store}>

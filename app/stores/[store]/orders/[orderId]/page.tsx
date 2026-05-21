@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { db } from "@/db"
-import * as schema from "@/db/schema/stores"
-import { eq } from "drizzle-orm"
+import { headers } from "next/headers"
+import { getOrder } from "@/lib/api/store-client"
 import { OrderOne, type OrderProps } from "@/components/commercn/orders/order-01"
 import { Button } from "@/components/ui/button"
 
@@ -12,44 +11,30 @@ export default async function OrderConfirmationPage({
   params: Promise<{ store: string; orderId: string }>
 }) {
   const { store: storeId, orderId } = await params
+  const host = (await headers()).get("host") || "localhost:3001"
+  const origin = `http://${host}`
 
-  // 1. Fetch order details
-  const orderResult = await db.query.orders.findFirst({
-    where: eq(schema.orders.id, orderId),
-  })
-
-  if (!orderResult) notFound()
-
-  // 2. Fetch order items
-  const itemsResult = await db.query.orderItems.findMany({
-    where: eq(schema.orderItems.orderId, orderId),
-  })
-
-  // 3. To get images for items, we could do a join, or just fetch the products
-  // For simplicity, let's fetch all store products to map images
-  const products = await db.query.storeProducts.findMany({
-    where: eq(schema.storeProducts.storeId, orderResult.storeId),
-  })
-  
-  const productImages: Record<string, string> = {}
-  for (const p of products) {
-    productImages[p.id] = p.image || ""
+  let orderResult
+  try {
+    orderResult = await getOrder(storeId, orderId, { origin })
+  } catch {
+    notFound()
   }
 
   const orderProps: OrderProps = {
     orderNumber: orderResult.orderNumber,
     status: orderResult.status,
-    orderDate: orderResult.createdAt.toDateString(),
-    estimatedDelivery: new Date(orderResult.createdAt.getTime() + 4 * 24 * 60 * 60 * 1000).toDateString(), // +4 days
-    items: itemsResult.map((item) => ({
-      id: item.id,
+    orderDate: new Date().toDateString(),
+    estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toDateString(),
+    items: orderResult.items.map((item) => ({
+      id: item.productName,
       name: item.productName,
       price: item.price,
       quantity: item.quantity,
-      image: item.productId ? (productImages[item.productId] || "") : "",
+      image: "",
     })),
     payment: {
-      method: "Credit Card (Mock)",
+      method: "Credit Card",
       total: orderResult.total,
     },
   }

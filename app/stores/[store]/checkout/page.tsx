@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCart } from "@/hooks/use-cart"
-import { submitOrder } from "@/lib/actions/orders"
 
 export default function CheckoutPage({
   params,
@@ -41,19 +40,20 @@ export default function CheckoutPage({
     setIsSubmitting(true)
     setError(null)
 
-    const result = await submitOrder({
-      storeSlug: store,
-      lines: cartLinesArray,
-      customerEmail: email,
-      shippingAddress: address,
-      idempotencyKey,
-    })
+    try {
+      const { checkout } = await import("@/lib/api/store-client")
+      const sessionToken = localStorage.getItem(`storefront_cart_session_v1:${store}`) || ""
+      const result = await checkout(store, {
+        sessionToken,
+        customerEmail: email,
+        shippingAddress: address,
+        idempotencyKey,
+      })
 
-    if (result.success && result.orderId) {
       clearCart()
-      router.push(`/stores/${store}/orders/${result.orderId}`)
-    } else {
-      setError(result.error || "Failed to process checkout.")
+      router.push(`/stores/${store}/orders/${result.order.id}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to process checkout.")
       setIsSubmitting(false)
     }
   }

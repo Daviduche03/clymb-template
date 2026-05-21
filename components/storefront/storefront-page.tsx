@@ -7,8 +7,8 @@ import { StoreThemeProvider } from "@/components/storefront/store-theme-provider
 import HeroSection01 from "@/components/shadcn-studio/blocks/hero-section-01/hero-section-01"
 import HeroSection41 from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
 import type { MenuData } from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
-import type { StorefrontConfig } from "@/lib/storefront-data"
-import { mapNavigationForStore } from "@/lib/storefront-data"
+import type { StorefrontConfig } from "@/lib/types"
+import { mapNavigationForStore } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 

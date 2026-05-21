@@ -6,7 +6,7 @@ import { ShoppingCartOne } from "@/components/commercn/carts/cart-01"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/use-cart"
-import { mapNavigationForStore, type StorefrontConfig } from "@/lib/storefront-data"
+import { mapNavigationForStore, type StorefrontConfig } from "@/lib/types"
 
 export function CartPageClient({
   store,

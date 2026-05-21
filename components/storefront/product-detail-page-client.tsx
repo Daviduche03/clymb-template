@@ -10,7 +10,7 @@ import {
   toCartLine,
   type StoreProduct,
   type StorefrontConfig,
-} from "@/lib/storefront-data"
+} from "@/lib/types"
 import { StorefrontHeader } from "@/components/storefront/storefront-header"
 import { Button } from "@/components/ui/button"
 

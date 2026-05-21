@@ -26,8 +26,10 @@ export type ShoppingCartLine = {
 	image: string
 	price: number
 	quantity: number
+	productId?: string
 	variantId?: string
 	variantTitle?: string
+	cartItemId?: string
 	sku?: string
 	currency?: string
 }

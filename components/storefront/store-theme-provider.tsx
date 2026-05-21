@@ -1,4 +1,4 @@
-import type { StorefrontConfig } from "@/lib/storefront-data"
+import type { StorefrontConfig } from "@/lib/types"
 import type { CSSProperties } from "react"
 import type { ReactNode } from "react"
 

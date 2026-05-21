@@ -1,27 +1,40 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { ShoppingCartOne } from "@/components/commercn/carts/cart-01"
 import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/use-cart"
-import { galaxyWatchStore, mapNavigationForStore } from "@/lib/storefront-data"
+import { mapNavigationForStore } from "@/lib/types"
+import type { StorefrontConfig } from "@/lib/types"
+import { DEFAULT_STORE_ID } from "@/lib/api/store-client"
 
 export default function CartPage() {
-  const { lines, cartTotal, setLineQty, removeLine, isLoaded } = useCart("galaxy-watch")
+  const { lines, cartTotal, setLineQty, removeLine, isLoaded } = useCart(DEFAULT_STORE_ID)
+  const [store, setStore] = useState<StorefrontConfig | null>(null)
+
+  useEffect(() => {
+    import("@/lib/api/store-client").then(({ getStorefrontConfig }) => {
+      getStorefrontConfig(DEFAULT_STORE_ID).then((config) => {
+        if (config) setStore(config)
+      })
+    })
+  }, [])
+
+  if (!isLoaded || !store) return null
+
   const cartLines = Object.values(lines)
   const lineCount = cartLines.reduce((sum, line) => sum + line.quantity, 0)
-  const navigation = mapNavigationForStore("", galaxyWatchStore.navigation)
-
-  if (!isLoaded) return null;
+  const navigation = mapNavigationForStore("", store.navigation)
 
   return (
-    <StoreThemeProvider config={galaxyWatchStore}>
+    <StoreThemeProvider config={store}>
       <main className="min-h-screen bg-white text-zinc-900">
         <Header
           navigationData={navigation}
-          logoUrl={galaxyWatchStore.theme?.logoUrl}
+          logoUrl={store.theme?.logoUrl}
           className="border-zinc-200 bg-white"
         />
 
@@ -78,7 +91,7 @@ export default function CartPage() {
                   <span>${cartTotal.toFixed(2)}</span>
                 </div>
                 <Button className="mt-5 w-full" size="lg" asChild>
-                  <Link href={`/stores/galaxy-watch/checkout`}>Proceed to checkout</Link>
+                  <Link href={`/stores/${DEFAULT_STORE_ID}/checkout`}>Proceed to checkout</Link>
                 </Button>
               </div>
             </div>

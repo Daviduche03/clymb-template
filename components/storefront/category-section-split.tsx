@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { StoreCategory } from "@/lib/storefront-data"
+import type { StoreCategory } from "@/lib/types"
 
 export function CategorySectionSplit({
   categories,

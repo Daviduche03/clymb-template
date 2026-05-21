@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { ShoppingCartLine } from "@/components/commercn/carts/cart-01"
-type CartApiSnapshot = {
+import { getCart, addToCart, updateCartItem, deleteCartItem } from "@/lib/api/store-client"
+
+type CartApiData = {
+  cart: { id: string } | null
   items: ShoppingCartLine[]
+  subtotal: number
 }
 
 const CART_SESSION_KEY_PREFIX = "storefront_cart_session_v1"
@@ -39,15 +43,8 @@ export function useCart(storeId: string = "default") {
   const [isLoaded, setIsLoaded] = useState(false)
 
   const hydrateCart = useCallback(async (targetStoreId: string, token: string) => {
-    const response = await fetch(
-      `/api/cart?store=${encodeURIComponent(targetStoreId)}&sessionToken=${encodeURIComponent(token)}`,
-      { cache: "no-store" },
-    )
-    if (!response.ok) {
-      throw new Error("Failed to load cart.")
-    }
-    const payload = (await response.json()) as { cart: CartApiSnapshot | null }
-    setLines(mapItemsToRecord(payload.cart?.items ?? []))
+    const data = await getCart(targetStoreId, token)
+    setLines(mapItemsToRecord(data.items ?? []))
   }, [])
 
   useEffect(() => {
@@ -78,45 +75,44 @@ export function useCart(storeId: string = "default") {
     [lines],
   )
 
-  const addToCart = useCallback(async (line: ShoppingCartLine) => {
+  const addToCartHandler = useCallback(async (line: ShoppingCartLine) => {
     if (!sessionToken) return
-    const response = await fetch("/api/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        storeSlug: storeId,
+    try {
+      await addToCart(storeId, {
         sessionToken,
-        productSlug: line.id,
+        productId: line.productId || line.id,
         quantity: line.quantity,
-        variantId: line.variantId,
-        variantTitle: line.variantTitle,
-      }),
-    })
-
-    if (!response.ok) return
-    const payload = (await response.json()) as { cart: CartApiSnapshot | null }
-    setLines(mapItemsToRecord(payload.cart?.items ?? []))
+        variantId: line.variantId || "default",
+      })
+      const data = await getCart(storeId, sessionToken)
+      setLines(mapItemsToRecord(data.items ?? []))
+    } catch {}
   }, [sessionToken, storeId])
 
   const setLineQty = useCallback(async (id: string, quantity: number) => {
     if (!sessionToken) return
     const existing = lines[id]
-    if (!existing?.variantId) return
+    const itemId = existing?.cartItemId || existing?.variantId
+    if (!itemId) return
 
-    const response = await fetch("/api/cart", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sessionToken,
-        variantId: existing.variantId,
-        quantity,
-      }),
-    })
+    try {
+      if (quantity === 0) {
+        await deleteCartItem(storeId, sessionToken, itemId)
+        setLines((prev) => {
+          const next = { ...prev }
+          delete next[id]
+          return next
+        })
+        return
+      }
 
-    if (!response.ok) return
-    const payload = (await response.json()) as { cart: CartApiSnapshot | null }
-    setLines(mapItemsToRecord(payload.cart?.items ?? []))
-  }, [lines, sessionToken])
+      await updateCartItem(storeId, sessionToken, itemId, quantity)
+      setLines((prev) => ({
+        ...prev,
+        [id]: { ...prev[id], quantity },
+      }))
+    } catch {}
+  }, [lines, sessionToken, storeId])
 
   const removeLine = useCallback(async (id: string) => {
     await setLineQty(id, 0)
@@ -133,7 +129,7 @@ export function useCart(storeId: string = "default") {
     lines,
     cartCount,
     cartTotal,
-    addToCart,
+    addToCart: addToCartHandler,
     setLineQty,
     removeLine,
     clearCart,

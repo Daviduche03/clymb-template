@@ -2,7 +2,7 @@ import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import type { NavigationSection } from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import { HeaderEditorialMinimal } from "@/components/storefront/header-editorial-minimal"
 import { HeaderPerformance } from "@/components/storefront/header-performance"
-import type { StorefrontConfig } from "@/lib/storefront-data"
+import type { StorefrontConfig } from "@/lib/types"
 
 type StorefrontHeaderProps = {
   store: StorefrontConfig

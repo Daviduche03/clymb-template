@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation"
+import { headers } from "next/headers"
 import { ProductDetailPageClient } from "@/components/storefront/product-detail-page-client"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
-import { getStoreBySlug } from "@/lib/api/stores"
+import { getStorefrontConfig } from "@/lib/api/store-client"
 
 export default async function StoreProductPage({
   params,
@@ -9,7 +10,9 @@ export default async function StoreProductPage({
   params: Promise<{ store: string; slug: string }>
 }) {
   const { store: storeId, slug } = await params
-  const store = await getStoreBySlug(storeId)
+  const host = (await headers()).get("host") || "localhost:3001"
+  const origin = `http://${host}`
+  const store = await getStorefrontConfig(storeId, { origin })
   if (!store) notFound()
 
   const product = store.products.find((p) => p.slug === slug)

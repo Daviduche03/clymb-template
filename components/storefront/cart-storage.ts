@@ -1,7 +1,7 @@
 "use client"
 
 import type { ShoppingCartLine } from "@/components/commercn/carts/cart-01"
-import { CART_STORAGE_KEY } from "@/lib/storefront-data"
+const CART_STORAGE_KEY = "storefront_cart_v1"
 
 function keyForStore(storeId: string) {
   return `${CART_STORAGE_KEY}:${storeId}`

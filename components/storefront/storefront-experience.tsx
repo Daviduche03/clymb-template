@@ -34,7 +34,7 @@ import {
   type StorefrontConfig,
   type StorefrontSection,
   type StoreProduct,
-} from "@/lib/storefront-data"
+} from "@/lib/types"
 import { useCart } from "@/hooks/use-cart"
 import { useWishlist } from "@/hooks/use-wishlist"
 
@@ -90,7 +90,8 @@ export function StorefrontExperience({
 
   const categoryTags = useMemo(() => {
     const tags = new Set<string>()
-    config.products.forEach((product) => product.badges.forEach((badge) => tags.add(badge)))
+    const products = config.products ?? []
+    products.forEach((product) => product.badges.forEach((badge) => tags.add(badge)))
     return [...tags]
   }, [config.products])
 
