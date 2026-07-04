@@ -1,12 +1,19 @@
 import type { NavigationSection } from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import type { ProductItem } from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-01"
+import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
 import type { ProductDetailModel } from "@/components/commercn/product-details/product-detail-01"
 
 export type StoreProduct = ProductItem & {
   id?: string
   slug: string
   detail?: Partial<ProductDetailModel>
+  variants?: Array<{
+    id: string
+    title: string
+    available: number
+    inventory?: number
+    reserved?: number
+  }>
 }
 
 export type StoreCategory = {
@@ -26,7 +33,7 @@ export type StorefrontVariants = {
   cart: "dialog" | "route" | "both"
   search: "panel" | "minimal"
   productPage: "editorial" | "split"
-  cartStyle: "standard" | "minimal"
+  cartStyle: "cart-01" | "cart-02" | "cart-03"
   footer: "footer-01" | "footer-02" | "footer-03"
 }
 
@@ -76,6 +83,15 @@ export function mapNavigationForStore(basePath: string, nav: NavigationSection[]
 
 export function productToDetailModel(product: StoreProduct): ProductDetailModel {
   const unit = product.salePrice ?? product.price
+  const sizeAvailability =
+    product.variants && product.variants.length > 0
+      ? Object.fromEntries(product.variants.map((variant) => [variant.title, variant.available]))
+      : undefined
+  const totalAvailable =
+    product.variants && product.variants.length > 0
+      ? product.variants.reduce((sum, variant) => sum + variant.available, 0)
+      : (product.inventory ?? 0)
+
   return {
     name: product.name,
     category: product.detail?.category ?? (product.badges.join(" · ") || "Wearables"),
@@ -83,12 +99,18 @@ export function productToDetailModel(product: StoreProduct): ProductDetailModel 
       product.detail?.description ??
       `Includes ${product.badges.join(" · ")}. Built for all-day comfort, fitness tracking, and seamless notifications.`,
     images: product.detail?.images ?? [product.image, product.image, product.image, product.image],
-    sizes: product.detail?.sizes ?? ["40mm", "44mm", "Ultra"],
+    sizes: product.detail?.sizes ?? product.variants?.map((variant) => variant.title) ?? ["40mm", "44mm", "Ultra"],
     currency: product.detail?.currency ?? "$",
     currentPrice: product.detail?.currentPrice ?? unit,
     compareAtPrice:
       product.detail?.compareAtPrice ?? (product.salePrice != null ? product.price : undefined),
-    stockMessage: product.detail?.stockMessage ?? "Free returns within 30 days.",
+    stockMessage:
+      totalAvailable <= 0
+        ? "Out of stock"
+        : totalAvailable <= 3
+          ? `Only ${totalAvailable} left`
+          : (product.detail?.stockMessage ?? "Free returns within 30 days."),
+    sizeAvailability,
   }
 }
 

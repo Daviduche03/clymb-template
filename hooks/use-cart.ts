@@ -1,14 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-01"
-import { getCart, addToCart, updateCartItem, deleteCartItem } from "@/lib/api/store-client"
-
-type CartApiData = {
-  cart: { id: string } | null
-  items: ShoppingCartLine[]
-  subtotal: number
-}
+import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
+import { getCart, addToCart, updateCartItem, deleteCartItem, getStore, StoreApiError } from "@/lib/api/store-client"
 
 const CART_SESSION_KEY_PREFIX = "storefront_cart_session_v1"
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function sessionKeyForStore(storeId: string) {
   return `${CART_SESSION_KEY_PREFIX}:${storeId}`
@@ -29,6 +24,36 @@ function getOrCreateSessionToken(storeId: string) {
   return created
 }
 
+function migrateSessionToken(fromStoreId: string, toStoreId: string) {
+  if (typeof window === "undefined") return getOrCreateSessionToken(toStoreId)
+  if (fromStoreId === toStoreId) return getOrCreateSessionToken(toStoreId)
+
+  const oldKey = sessionKeyForStore(fromStoreId)
+  const newKey = sessionKeyForStore(toStoreId)
+  const oldToken = window.localStorage.getItem(oldKey)
+  const newToken = window.localStorage.getItem(newKey)
+
+  if (oldToken && !newToken) {
+    window.localStorage.setItem(newKey, oldToken)
+    window.localStorage.removeItem(oldKey)
+    return oldToken
+  }
+
+  return getOrCreateSessionToken(toStoreId)
+}
+
+async function resolveCartStoreId(storeId: string): Promise<string> {
+  if (storeId === "default") return storeId
+  if (!UUID_RE.test(storeId)) return storeId
+
+  try {
+    const store = await getStore(storeId)
+    return store.slug
+  } catch {
+    return storeId
+  }
+}
+
 function mapItemsToRecord(items: ShoppingCartLine[]) {
   const record: Record<string, ShoppingCartLine> = {}
   for (const item of items) {
@@ -38,9 +63,11 @@ function mapItemsToRecord(items: ShoppingCartLine[]) {
 }
 
 export function useCart(storeId: string = "default") {
+  const [cartStoreId, setCartStoreId] = useState<string | null>(null)
   const [lines, setLines] = useState<Record<string, ShoppingCartLine>>({})
   const [sessionToken, setSessionToken] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [cartError, setCartError] = useState<string | null>(null)
 
   const hydrateCart = useCallback(async (targetStoreId: string, token: string) => {
     const data = await getCart(targetStoreId, token)
@@ -49,21 +76,32 @@ export function useCart(storeId: string = "default") {
 
   useEffect(() => {
     let cancelled = false
-    const token = getOrCreateSessionToken(storeId)
-    setSessionToken(token)
 
-    hydrateCart(storeId, token)
-      .catch(() => {
+    void (async () => {
+      setIsLoaded(false)
+      const resolvedStoreId = await resolveCartStoreId(storeId)
+      const token = migrateSessionToken(storeId, resolvedStoreId)
+
+      if (cancelled) return
+
+      setCartStoreId(resolvedStoreId)
+      setSessionToken(token)
+
+      try {
+        await hydrateCart(resolvedStoreId, token)
+      } catch {
         if (!cancelled) setLines({})
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setIsLoaded(true)
-      })
+      }
+    })()
 
     return () => {
       cancelled = true
     }
   }, [storeId, hydrateCart])
+
+  const activeStoreId = cartStoreId ?? storeId
 
   const cartCount = useMemo(
     () => Object.values(lines).reduce((sum, l) => sum + l.quantity, 0),
@@ -76,28 +114,40 @@ export function useCart(storeId: string = "default") {
   )
 
   const addToCartHandler = useCallback(async (line: ShoppingCartLine) => {
-    if (!sessionToken) return
+    const resolvedStoreId = cartStoreId ?? (await resolveCartStoreId(storeId))
+    const token = sessionToken ?? migrateSessionToken(storeId, resolvedStoreId)
+
     try {
-      await addToCart(storeId, {
-        sessionToken,
+      setCartError(null)
+      await addToCart(resolvedStoreId, {
+        sessionToken: token,
         productId: line.productId || line.id,
         quantity: line.quantity,
         variantId: line.variantId || "default",
       })
-      const data = await getCart(storeId, sessionToken)
+      const data = await getCart(resolvedStoreId, token)
+      setSessionToken(token)
+      setCartStoreId(resolvedStoreId)
       setLines(mapItemsToRecord(data.items ?? []))
-    } catch {}
-  }, [sessionToken, storeId])
+    } catch (error) {
+      const message = error instanceof StoreApiError ? error.message : "Could not add to cart"
+      setCartError(message)
+      throw error
+    }
+  }, [cartStoreId, sessionToken, storeId])
 
   const setLineQty = useCallback(async (id: string, quantity: number) => {
-    if (!sessionToken) return
+    const token = sessionToken
+    if (!token) return
+
     const existing = lines[id]
-    const itemId = existing?.cartItemId || existing?.variantId
+    const itemId = existing?.cartItemId
     if (!itemId) return
 
     try {
+      setCartError(null)
       if (quantity === 0) {
-        await deleteCartItem(storeId, sessionToken, itemId)
+        await deleteCartItem(activeStoreId, token, itemId)
         setLines((prev) => {
           const next = { ...prev }
           delete next[id]
@@ -106,13 +156,16 @@ export function useCart(storeId: string = "default") {
         return
       }
 
-      await updateCartItem(storeId, sessionToken, itemId, quantity)
+      await updateCartItem(activeStoreId, token, itemId, quantity)
       setLines((prev) => ({
         ...prev,
         [id]: { ...prev[id], quantity },
       }))
-    } catch {}
-  }, [lines, sessionToken, storeId])
+    } catch (error) {
+      const message = error instanceof StoreApiError ? error.message : "Could not update cart"
+      setCartError(message)
+    }
+  }, [activeStoreId, lines, sessionToken])
 
   const removeLine = useCallback(async (id: string) => {
     await setLineQty(id, 0)
@@ -134,5 +187,9 @@ export function useCart(storeId: string = "default") {
     removeLine,
     clearCart,
     isLoaded,
+    cartStoreId: activeStoreId,
+    sessionToken,
+    cartError,
+    clearCartError: () => setCartError(null),
   }
 }

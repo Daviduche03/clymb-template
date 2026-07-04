@@ -3,6 +3,7 @@ import { PromoBannerThree } from "@/components/commercn/promo-banners/promo-bann
 import { HeroSectionEditorial } from "@/components/storefront/hero-section-editorial"
 import { StorefrontHeader } from "@/components/storefront/storefront-header"
 import { StorefrontExperience } from "@/components/storefront/storefront-experience"
+import { StoreAnalyticsTracker } from "@/components/storefront/store-analytics-tracker"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
 import HeroSection01 from "@/components/shadcn-studio/blocks/hero-section-01/hero-section-01"
 import HeroSection41 from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
@@ -117,6 +118,7 @@ export function StorefrontPage({
 
   return (
     <StoreThemeProvider config={store}>
+      <StoreAnalyticsTracker storeId={store.id} />
       <main className="min-h-screen bg-white">
         {store.variants.banner === "promo-03" ? <PromoBannerThree /> : null}
         {store.variants.banner === "promo-01" ? <PromoBannerOne /> : null}

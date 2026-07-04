@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
-const API_KEY = process.env.CLYMB_API_KEY || ""
 
 async function proxy(request: NextRequest, method: string) {
   const { pathname, search } = request.nextUrl
   const path = pathname.replace(/^\/api\/store\//, "")
   const url = `${API_BASE}/api/v1/store/${path}${search}`
   const headers: Record<string, string> = { "Content-Type": "application/json" }
-  if (API_KEY) headers["Authorization"] = `Bearer ${API_KEY}`
 
   try {
     const body = method === "GET" || method === "HEAD" ? undefined : await request.json()

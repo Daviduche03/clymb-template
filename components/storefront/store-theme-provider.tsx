@@ -2,6 +2,14 @@ import type { StorefrontConfig } from "@/lib/types"
 import type { CSSProperties } from "react"
 import type { ReactNode } from "react"
 
+function normalizeThemeColor(value: string): string {
+  const trimmed = value.trim()
+  if (/^oklch\(/i.test(trimmed) || /^#[0-9a-f]{3,8}$/i.test(trimmed) || /^rgb/i.test(trimmed) || /^hsl/i.test(trimmed)) {
+    return trimmed
+  }
+  return `oklch(${trimmed})`
+}
+
 export function StoreThemeProvider({
   config,
   children,
@@ -31,10 +39,10 @@ export function StoreThemeProvider({
   }
 
   if (config.theme?.primaryColor) {
-    style["--primary"] = `oklch(${config.theme.primaryColor})`
+    style["--primary"] = normalizeThemeColor(config.theme.primaryColor)
   }
   if (config.theme?.accentColor) {
-    style["--accent"] = `oklch(${config.theme.accentColor})`
+    style["--accent"] = normalizeThemeColor(config.theme.accentColor)
   }
 
   return (

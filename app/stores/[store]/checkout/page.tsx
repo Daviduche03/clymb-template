@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, use, useMemo } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,9 +12,8 @@ export default function CheckoutPage({
   params: Promise<{ store: string }>
 }) {
   const { store } = use(params)
-  const router = useRouter()
-  const { lines, cartTotal, isLoaded, clearCart } = useCart(store)
-  
+  const { lines, cartTotal, isLoaded, cartStoreId, sessionToken } = useCart(store)
+
   const [email, setEmail] = useState("")
   const [address, setAddress] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -23,6 +21,7 @@ export default function CheckoutPage({
   const [idempotencyKey] = useState(() => crypto.randomUUID())
 
   const cartLinesArray = useMemo(() => Object.values(lines), [lines])
+  const activeStoreId = cartStoreId ?? store
 
   if (!isLoaded) return null
 
@@ -30,7 +29,7 @@ export default function CheckoutPage({
     return (
       <main className="min-h-screen px-4 py-10 sm:px-6 lg:px-8 max-w-xl mx-auto text-center">
         <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
-        <Button onClick={() => router.push(`/stores/${store}`)}>Return to Store</Button>
+        <Button onClick={() => { window.location.href = `/stores/${activeStoreId}` }}>Return to Store</Button>
       </main>
     )
   }
@@ -41,17 +40,30 @@ export default function CheckoutPage({
     setError(null)
 
     try {
+      const token =
+        sessionToken ||
+        (typeof window !== "undefined"
+          ? window.localStorage.getItem(`storefront_cart_session_v1:${activeStoreId}`)
+          : null)
+
+      if (!token) {
+        throw new Error("Cart session expired. Add items again and retry checkout.")
+      }
+
       const { checkout } = await import("@/lib/api/store-client")
-      const sessionToken = localStorage.getItem(`storefront_cart_session_v1:${store}`) || ""
-      const result = await checkout(store, {
-        sessionToken,
+      const result = await checkout(activeStoreId, {
+        sessionToken: token,
         customerEmail: email,
         shippingAddress: address,
         idempotencyKey,
       })
 
-      clearCart()
-      router.push(`/stores/${store}/orders/${result.order.id}`)
+      if (result.paymentUrl) {
+        window.location.href = result.paymentUrl
+        return
+      }
+
+      window.location.href = `/stores/${activeStoreId}/orders/${result.order.id}?session=${encodeURIComponent(token)}`
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to process checkout.")
       setIsSubmitting(false)
@@ -79,7 +91,7 @@ export default function CheckoutPage({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address">Shipping Address (Demo)</Label>
+                <Label htmlFor="address">Shipping Address</Label>
                 <Input
                   id="address"
                   type="text"
@@ -92,12 +104,18 @@ export default function CheckoutPage({
             </div>
 
             <div className="space-y-4 rounded-lg border p-6">
-              <h2 className="text-xl font-semibold mb-4">Payment (Mock)</h2>
-              <p className="text-sm text-muted-foreground">This is a mock checkout. No payment details are required.</p>
-              
+              <h2 className="text-xl font-semibold mb-4">Payment</h2>
+              <p className="text-sm text-muted-foreground">
+                You&apos;ll be redirected to Polar to complete payment securely.
+              </p>
+
               {error && <p className="text-red-500 text-sm">{error}</p>}
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="w-full border border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Processing..." : `Pay $${cartTotal.toFixed(2)}`}
               </Button>
             </div>

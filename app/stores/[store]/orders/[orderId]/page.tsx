@@ -1,29 +1,36 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { headers } from "next/headers"
-import { getOrder } from "@/lib/api/store-client"
+import { getOrderConfirmation } from "@/lib/api/store-client"
 import { OrderOne, type OrderProps } from "@/components/commercn/orders/order-01"
 import { Button } from "@/components/ui/button"
 
 export default async function OrderConfirmationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ store: string; orderId: string }>
+  searchParams: Promise<{ session?: string }>
 }) {
   const { store: storeId, orderId } = await params
+  const { session } = await searchParams
   const host = (await headers()).get("host") || "localhost:3001"
   const origin = `http://${host}`
 
+  if (!session) {
+    notFound()
+  }
+
   let orderResult
   try {
-    orderResult = await getOrder(storeId, orderId, { origin })
+    orderResult = await getOrderConfirmation(storeId, orderId, session, { origin })
   } catch {
     notFound()
   }
 
   const orderProps: OrderProps = {
     orderNumber: orderResult.orderNumber,
-    status: orderResult.status,
+    status: orderResult.paymentStatus === "paid" ? orderResult.status : orderResult.paymentStatus,
     orderDate: new Date().toDateString(),
     estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toDateString(),
     items: orderResult.items.map((item) => ({
@@ -34,7 +41,7 @@ export default async function OrderConfirmationPage({
       image: "",
     })),
     payment: {
-      method: "Credit Card",
+      method: "Polar",
       total: orderResult.total,
     },
   }
@@ -48,7 +55,9 @@ export default async function OrderConfirmationPage({
           </div>
           <h1 className="text-3xl font-bold">Order Confirmed!</h1>
           <p className="text-muted-foreground text-lg">
-            Thank you for your purchase. We&apos;ve received your order and will begin processing it right away.
+            {orderResult.paymentStatus === "paid"
+              ? "Thank you for your purchase. We've received your order and will begin processing it right away."
+              : "Your order was created. Payment is still pending — refresh after completing checkout if you haven't paid yet."}
           </p>
         </div>
 

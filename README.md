@@ -27,7 +27,6 @@ Injected automatically by the Clymb orchestrator into `/workspace/.env.local`:
 |----------|---------|
 | `NEXT_PUBLIC_STORE_ID` | Which store/brand to display |
 | `NEXT_PUBLIC_API_URL` | Clymb backend API base URL |
-| `CLYMB_API_KEY` | API key for auth |
 
 ## Storefront Layout
 

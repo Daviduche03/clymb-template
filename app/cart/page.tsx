@@ -1,29 +1,18 @@
 "use client"
 
-import Link from "next/link"
 import { useEffect, useState } from "react"
-import { ShoppingCartOne } from "@/components/commercn/carts/cart-01"
 import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
+import { CartPageShell } from "@/components/storefront/cart-page-shell"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
-import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/use-cart"
 import { mapNavigationForStore } from "@/lib/types"
 import type { StorefrontConfig } from "@/lib/types"
-import { DEFAULT_STORE_ID } from "@/lib/api/store-client"
+import { DEFAULT_STORE_ID, getStorefrontConfig } from "@/lib/api/store-client"
 
-export default function CartPage() {
-  const { lines, cartTotal, setLineQty, removeLine, isLoaded } = useCart(DEFAULT_STORE_ID)
-  const [store, setStore] = useState<StorefrontConfig | null>(null)
+function CartPageContent({ store }: { store: StorefrontConfig }) {
+  const { lines, cartTotal, setLineQty, removeLine, isLoaded } = useCart(store.id)
 
-  useEffect(() => {
-    import("@/lib/api/store-client").then(({ getStorefrontConfig }) => {
-      getStorefrontConfig(DEFAULT_STORE_ID).then((config) => {
-        if (config) setStore(config)
-      })
-    })
-  }, [])
-
-  if (!isLoaded || !store) return null
+  if (!isLoaded) return null
 
   const cartLines = Object.values(lines)
   const lineCount = cartLines.reduce((sum, line) => sum + line.quantity, 0)
@@ -37,67 +26,31 @@ export default function CartPage() {
           logoUrl={store.theme?.logoUrl}
           className="border-zinc-200 bg-white"
         />
-
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-sm text-zinc-600">Review your items before checkout.</p>
-              <h1 className="text-3xl font-bold">Your Cart</h1>
-            </div>
-            <Button variant="outline" asChild>
-              <Link href="/">Continue shopping</Link>
-            </Button>
-          </div>
-
-          {cartLines.length === 0 ? (
-            <div className="rounded-2xl bg-zinc-100 px-6 py-10 text-center">
-              <p className="text-base text-zinc-700">Your cart is empty.</p>
-              <Button className="mt-4" asChild>
-                <Link href="/">Shop products</Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-              <div className="flex flex-col gap-4">
-                {cartLines.map((line) => (
-                  <ShoppingCartOne
-                    key={line.id}
-                    line={line}
-                    onQuantityChange={(q) => setLineQty(line.id, q)}
-                    onRemove={() => removeLine(line.id)}
-                  />
-                ))}
-              </div>
-
-              <div className="h-fit rounded-2xl bg-zinc-100 p-5">
-                <h2 className="text-lg font-semibold">Order Summary</h2>
-                <div className="mt-4 space-y-2 text-sm text-zinc-700">
-                  <div className="flex items-center justify-between">
-                    <span>Items</span>
-                    <span>{lineCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Subtotal</span>
-                    <span>${cartTotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Shipping</span>
-                    <span>Free</span>
-                  </div>
-                </div>
-                <div className="my-4 border-t border-zinc-200" />
-                <div className="flex items-center justify-between text-base font-semibold">
-                  <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
-                </div>
-                <Button className="mt-5 w-full" size="lg" asChild>
-                  <Link href={`/stores/${DEFAULT_STORE_ID}/checkout`}>Proceed to checkout</Link>
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+        <CartPageShell
+          store={store}
+          lines={cartLines}
+          lineCount={lineCount}
+          cartTotal={cartTotal}
+          continueHref="/"
+          checkoutHref={`/stores/${store.id}/checkout`}
+          onQuantityChange={setLineQty}
+          onRemove={removeLine}
+        />
       </main>
     </StoreThemeProvider>
   )
+}
+
+export default function CartPage() {
+  const [store, setStore] = useState<StorefrontConfig | null>(null)
+
+  useEffect(() => {
+    void getStorefrontConfig(DEFAULT_STORE_ID).then((config) => {
+      if (config) setStore(config)
+    })
+  }, [])
+
+  if (!store) return null
+
+  return <CartPageContent store={store} />
 }

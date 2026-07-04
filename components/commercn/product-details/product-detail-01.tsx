@@ -35,6 +35,7 @@ export type ProductDetailModel = {
 	/** Optional list / MSRP price */
 	compareAtPrice?: number
 	stockMessage?: string
+	sizeAvailability?: Record<string, number>
 }
 
 const defaultModel: ProductDetailModel = {
@@ -66,6 +67,12 @@ export function ProductDetailOne({ product, onAddToCart, className, variant = "e
 
 	const images = model.images
 	const len = Math.max(images.length, 1)
+	const selectedAvailable = model.sizeAvailability?.[selectedSize]
+	const isSelectedOutOfStock = selectedAvailable != null && selectedAvailable <= 0
+	const isFullyOutOfStock =
+		model.sizeAvailability != null
+			? Object.values(model.sizeAvailability).every((value) => value <= 0)
+			: false
 
 	const nextImage = () => {
 		setCurrentImageIndex((prev) => (prev + 1) % len)
@@ -168,17 +175,29 @@ export function ProductDetailOne({ product, onAddToCart, className, variant = "e
 					<div>
 						<h3 className="mb-2 text-sm font-medium">Size</h3>
 						<div className="flex flex-wrap gap-2">
-							{model.sizes.map((size) => (
-								<Button
-									key={size}
-									type="button"
-									variant={selectedSize === size ? "default" : "outline"}
-									size="sm"
-									onClick={() => setSelectedSize(size)}
-								>
-									{size}
-								</Button>
-							))}
+							{model.sizes.map((size) => {
+								const available = model.sizeAvailability?.[size]
+								const isUnavailable = available != null && available <= 0
+
+								return (
+									<Button
+										key={size}
+										type="button"
+										variant={selectedSize === size ? "default" : "outline"}
+										size="sm"
+										disabled={isUnavailable}
+										className={cn(
+											selectedSize === size
+												? "border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800"
+												: "border-zinc-300 text-zinc-900 hover:bg-zinc-50",
+											isUnavailable && "opacity-40",
+										)}
+										onClick={() => setSelectedSize(size)}
+									>
+										{size}
+									</Button>
+								)
+							})}
 						</div>
 					</div>
 
@@ -207,12 +226,18 @@ export function ProductDetailOne({ product, onAddToCart, className, variant = "e
 						<Button
 							type="button"
 							size="lg"
+							disabled={isFullyOutOfStock || isSelectedOutOfStock}
+							className="border border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800"
 							onClick={() => {
 								onAddToCart?.(quantity, selectedSize)
 								if (onAddToCart) setDidAdd(true)
 							}}
 						>
-							{didAdd ? "Added to cart" : "Add to cart"}
+							{isFullyOutOfStock || isSelectedOutOfStock
+								? "Out of stock"
+								: didAdd
+									? "Added to cart"
+									: "Add to cart"}
 						</Button>
 					</div>
 				</div>

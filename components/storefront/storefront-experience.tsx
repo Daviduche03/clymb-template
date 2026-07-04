@@ -12,7 +12,7 @@ import { ProductCardTwo } from "@/components/commercn/product-cards/product-card
 import { ProductCardThree } from "@/components/commercn/product-cards/product-card-03"
 import { ProductCardFour } from "@/components/commercn/product-cards/product-card-04"
 import { ProductDetailOne } from "@/components/commercn/product-details/product-detail-01"
-import { ShoppingCartOne } from "@/components/commercn/carts/cart-01"
+import { CartLine } from "@/components/commercn/carts/cart-line"
 import { CategorySectionSplit } from "@/components/storefront/category-section-split"
 import ProductList from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
 import { Badge } from "@/components/ui/badge"
@@ -57,7 +57,7 @@ export function StorefrontExperience({
   const [sortOrder, setSortOrder] = useState<SortOrder>("featured")
   const [currentPage, setCurrentPage] = useState(1)
 
-  const { lines, cartCount, addToCart: addToCartBase, setLineQty, removeLine } = useCart(config.id)
+  const { lines, cartCount, addToCart: addToCartBase, setLineQty, removeLine, cartError, clearCartError } = useCart(config.id)
   const { isWishlisted: isSlugWishlisted, toggleWishlist: toggleSlugWishlist } = useWishlist(config.id)
 
   const sections = useMemo(() => getDefaultStorefrontSections(config), [config])
@@ -71,14 +71,31 @@ export function StorefrontExperience({
   const productHref = useCallback((slug: string) => `${basePath}/products/${slug}`, [basePath])
   const cartHref = `${basePath}/cart`
 
-  const getInventory = useCallback((product: StoreProduct) => product.inventory ?? 12, [])
-  const isOutOfStock = useCallback((product: StoreProduct) => getInventory(product) <= 0, [getInventory])
-  const isLowStock = useCallback((product: StoreProduct) => getInventory(product) > 0 && getInventory(product) <= 3, [getInventory])
+  const getInventory = useCallback((product: StoreProduct, variantTitle?: string) => {
+    if (product.variants && product.variants.length > 0) {
+      if (variantTitle) {
+        return product.variants.find((variant) => variant.title === variantTitle)?.available ?? 0
+      }
+      return product.variants.reduce((sum, variant) => sum + variant.available, 0)
+    }
+    return product.inventory ?? 0
+  }, [])
+  const isOutOfStock = useCallback(
+    (product: StoreProduct, variantTitle?: string) => getInventory(product, variantTitle) <= 0,
+    [getInventory],
+  )
+  const isLowStock = useCallback(
+    (product: StoreProduct, variantTitle?: string) => {
+      const available = getInventory(product, variantTitle)
+      return available > 0 && available <= 3
+    },
+    [getInventory],
+  )
 
   const addToCart = useCallback(
     (product: StoreProduct, quantity: number, variantTitle?: string) => {
-      if (isOutOfStock(product)) return
-      addToCartBase(toCartLine(product, quantity, variantTitle))
+      if (isOutOfStock(product, variantTitle)) return
+      void addToCartBase(toCartLine(product, quantity, variantTitle)).catch(() => {})
       if (allowCartDialog) setCartOpen(true)
     },
     [addToCartBase, allowCartDialog, isOutOfStock],
@@ -341,6 +358,17 @@ export function StorefrontExperience({
 
   return (
     <>
+      {cartError ? (
+        <div className="fixed top-4 right-4 z-50 max-w-sm border border-red-200 bg-white px-4 py-3 text-sm text-red-700">
+          <div className="flex items-start justify-between gap-3">
+            <p>{cartError}</p>
+            <button type="button" className="text-red-500" onClick={clearCartError}>
+              ×
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {sections.map((section, index) => (
         <div key={`${section.type}-${index}`}>{renderSection(section)}</div>
       ))}
@@ -379,7 +407,16 @@ export function StorefrontExperience({
       </Dialog>
 
       <Dialog open={cartOpen} onOpenChange={setCartOpen}>
-        <DialogContent className={config.variants.cartStyle === "minimal" ? "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-3xl" : "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-lg"} showCloseButton>
+        <DialogContent
+          className={
+            config.variants.cartStyle === "cart-03"
+              ? "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-3xl"
+              : config.variants.cartStyle === "cart-02"
+                ? "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-2xl"
+                : "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-lg"
+          }
+          showCloseButton
+        >
           <DialogHeader>
             <DialogTitle>Your cart</DialogTitle>
             <DialogDescription>Adjust quantities or remove items. Cart syncs with your active server cart session.</DialogDescription>
@@ -387,9 +424,23 @@ export function StorefrontExperience({
           {Object.keys(lines).length === 0 ? (
             <p className="text-muted-foreground text-sm">Your cart is empty. Add any product from the collection.</p>
           ) : (
-            <div className={config.variants.cartStyle === "minimal" ? "grid gap-4 md:grid-cols-2" : "flex flex-col gap-4"}>
+            <div
+              className={
+                config.variants.cartStyle === "cart-02"
+                  ? "border border-zinc-200 px-3"
+                  : config.variants.cartStyle === "cart-03"
+                    ? "flex flex-col gap-3"
+                    : "flex flex-col gap-3"
+              }
+            >
               {Object.values(lines).map((line) => (
-                <ShoppingCartOne key={line.id} line={line} onQuantityChange={(quantity) => setLineQty(line.id, quantity)} onRemove={() => removeLine(line.id)} />
+                <CartLine
+                  key={line.id}
+                  variant={config.variants.cartStyle}
+                  line={line}
+                  onQuantityChange={(quantity) => setLineQty(line.id, quantity)}
+                  onRemove={() => removeLine(line.id)}
+                />
               ))}
             </div>
           )}

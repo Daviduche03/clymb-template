@@ -1,9 +1,7 @@
 import type {
-  StoreCategory,
   StoreProduct,
   StorefrontConfig,
   StorefrontVariants,
-  StorefrontSection,
 } from "@/lib/types"
 import type { NavigationSection } from "@/components/shadcn-studio/blocks/hero-section-01/header"
 
@@ -21,8 +19,31 @@ const defaultVariants: StorefrontVariants = {
   cart: "dialog",
   search: "panel",
   productPage: "editorial",
-  cartStyle: "standard",
+  cartStyle: "cart-02",
   footer: "footer-01",
+}
+
+const defaultNavigation: NavigationSection[] = [
+  { title: "Home", href: "/" },
+  { title: "Shop", href: "#collection" },
+  { title: "Cart", href: "/cart" },
+]
+
+function normalizeStoreNavigation(raw: StoreResponse["navigation"]): NavigationSection[] {
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return defaultNavigation
+  }
+
+  const items = raw
+    .map((entry) => {
+      const title = entry.title?.trim() || entry.label?.trim() || ""
+      const href = entry.href?.trim() || ""
+      if (!title || !href) return null
+      return { title, href }
+    })
+    .filter((item): item is NavigationSection => item !== null)
+
+  return items.length > 0 ? items : defaultNavigation
 }
 
 class StoreApiError extends Error {
@@ -34,6 +55,8 @@ class StoreApiError extends Error {
     this.name = "StoreApiError"
   }
 }
+
+export { StoreApiError }
 
 async function request<T>(
   path: string,
@@ -72,30 +95,10 @@ export type StoreResponse = {
   logoUrl: string | null
   primaryColor: string | null
   accentColor: string | null
+  navigation?: Array<{ title?: string; label?: string; href: string }> | null
   brandId: string | null
   createdAt: string
   updatedAt: string
-}
-
-export type ProductResponse = {
-  id: string
-  storeId: string
-  slug: string
-  name: string
-  price: number
-  salePrice: number | null
-  image: string
-  category: string
-  description: string
-  inventory: number
-  active: boolean
-  variants: Array<{
-    id: string
-    sku: string
-    title: string
-    price: number
-    inventory: number
-  }>
 }
 
 export type CartItemResponse = {
@@ -178,6 +181,13 @@ export async function getStoreProducts(
       imgAlt?: string
       badges: string[]
       inventory?: number
+      variants?: Array<{
+        id: string
+        title: string
+        available: number
+        inventory?: number
+        reserved?: number
+      }>
       category?: string
       description?: string
       images?: string[]
@@ -197,13 +207,6 @@ export async function getStoreProducts(
   }>(`/${storeId}/products?${params}`, opts || {})
 }
 
-export async function getSingleProduct(
-  storeId: string,
-  productId: string,
-): Promise<ProductResponse> {
-  return request<ProductResponse>(`/${storeId}/products/${productId}`)
-}
-
 export async function addToCart(
   storeId: string,
   body: {
@@ -217,6 +220,24 @@ export async function addToCart(
     method: "POST",
     body: JSON.stringify(body),
   })
+}
+
+export async function trackStorePageView(storeId: string, productId?: string) {
+  const { getStoreSessionId } = await import("@/lib/analytics/session")
+  const sessionId = getStoreSessionId()
+  if (!sessionId) return
+
+  await fetch(`${API_BASE}/${storeId}/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      type: "page_view",
+      sessionId,
+      productId,
+    }),
+  }).catch(() => undefined)
 }
 
 export async function getCart(
@@ -279,20 +300,14 @@ export async function checkout(
   })
 }
 
-export async function getOrders(storeId: string, page = 1, limit = 20) {
-  return request<{
-    orders: Array<{
-      id: string
-      orderNumber: string
-      status: string
-      paymentStatus: string
-      subtotal: number
-      total: number
-      customerEmail: string
-      createdAt: string
-    }>
-    pagination: { page: number; limit: number; total: number; totalPages: number }
-  }>(`/${storeId}/orders?page=${page}&limit=${limit}`)
+export async function getOrderConfirmation(
+  storeId: string,
+  orderId: string,
+  sessionToken: string,
+  opts?: { origin?: string },
+): Promise<OrderResponse> {
+  const params = new URLSearchParams({ sessionToken })
+  return request<OrderResponse>(`/${storeId}/orders/${orderId}/confirmation?${params}`, opts || {})
 }
 
 export async function getOrder(
@@ -324,11 +339,7 @@ export async function getStorefrontConfig(
       heroTitle: store.heroTitle,
       heroDescription: store.heroDescription,
       heroImage: store.heroImage,
-      navigation: options?.navigation ?? [
-        { title: "Home", href: "/" },
-        { title: "Shop", href: "#collection" },
-        { title: "Cart", href: "/cart" },
-      ],
+      navigation: options?.navigation ?? normalizeStoreNavigation(store.navigation),
       categories: categories.map((c) => ({
         id: c.id,
         title: c.title,
@@ -347,6 +358,15 @@ export async function getStorefrontConfig(
             imgAlt: p?.imgAlt ?? p?.name ?? "",
             badges: Array.isArray(p?.badges) ? p.badges : [],
             inventory: p?.inventory ?? 0,
+            variants: Array.isArray(p?.variants)
+              ? p.variants.map((variant) => ({
+                  id: variant.id,
+                  title: variant.title,
+                  available: variant.available ?? 0,
+                  inventory: variant.inventory,
+                  reserved: variant.reserved,
+                }))
+              : [],
             detail: p?.detail ?? (p?.category || p?.description ? {
               category: p?.category,
               description: p?.description,

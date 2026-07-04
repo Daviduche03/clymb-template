@@ -12,6 +12,7 @@ import {
   type StorefrontConfig,
 } from "@/lib/types"
 import { StorefrontHeader } from "@/components/storefront/storefront-header"
+import { StoreAnalyticsTracker } from "@/components/storefront/store-analytics-tracker"
 import { Button } from "@/components/ui/button"
 
 type ProductDetailPageClientProps = {
@@ -34,6 +35,7 @@ export function ProductDetailPageClient({
 
   return (
     <main className="min-h-screen bg-white text-zinc-900">
+      <StoreAnalyticsTracker storeId={store.id} productId={product.id} />
       <StorefrontHeader
         store={store}
         navigation={navigation}
@@ -54,7 +56,7 @@ export function ProductDetailPageClient({
             <Button variant="outline" asChild>
               <Link href={storeHref}>Back to store</Link>
             </Button>
-            <Button asChild>
+            <Button className="border border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800" asChild>
               <Link href={cartHref}>Go to cart</Link>
             </Button>
           </div>
@@ -65,7 +67,7 @@ export function ProductDetailPageClient({
         <ProductDetailOne
           product={productToDetailModel(product)}
           variant={store.variants.productPage}
-          onAddToCart={(quantity) => addToCart(toCartLine(product, quantity))}
+          onAddToCart={(quantity, size) => addToCart(toCartLine(product, quantity, size))}
         />
       </div>
 
