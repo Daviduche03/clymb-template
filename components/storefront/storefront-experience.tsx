@@ -3,7 +3,7 @@
 import Link from "next/link"
 import type { ReactNode } from "react"
 import { useCallback, useMemo, useState } from "react"
-import { ArrowRight, Search, ShoppingBag, X } from "lucide-react"
+import { ArrowRight, Search, X } from "lucide-react"
 import { CategoryCard } from "@/components/commercn/categories/category-01"
 import { CategoryListCard } from "@/components/commercn/categories/category-02"
 import { CategoryFour } from "@/components/commercn/categories/category-04"
@@ -12,17 +12,12 @@ import { ProductCardTwo } from "@/components/commercn/product-cards/product-card
 import { ProductCardThree } from "@/components/commercn/product-cards/product-card-03"
 import { ProductCardFour } from "@/components/commercn/product-cards/product-card-04"
 import { ProductDetailOne } from "@/components/commercn/product-details/product-detail-01"
-import { CartLine } from "@/components/commercn/carts/cart-line"
 import { CategorySectionSplit } from "@/components/storefront/category-section-split"
 import ProductList from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Pagination } from "@/components/ui/pagination"
@@ -49,7 +44,6 @@ export function StorefrontExperience({
   basePath?: string
 }) {
   const [detailOpen, setDetailOpen] = useState(false)
-  const [cartOpen, setCartOpen] = useState(false)
   const [selected, setSelected] = useState<StoreProduct | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
@@ -57,7 +51,7 @@ export function StorefrontExperience({
   const [sortOrder, setSortOrder] = useState<SortOrder>("featured")
   const [currentPage, setCurrentPage] = useState(1)
 
-  const { lines, cartCount, addToCart: addToCartBase, setLineQty, removeLine, cartError, clearCartError } = useCart(config.id)
+  const { lines, addToCart: addToCartBase, setLineQty, removeLine, cartError, clearCartError } = useCart(config.id)
   const { isWishlisted: isSlugWishlisted, toggleWishlist: toggleSlugWishlist } = useWishlist(config.id)
 
   const sections = useMemo(() => getDefaultStorefrontSections(config), [config])
@@ -65,7 +59,6 @@ export function StorefrontExperience({
 
   const allowDetailDialog = config.variants.productDetails === "dialog" || config.variants.productDetails === "both"
   const allowDetailRoute = config.variants.productDetails === "route" || config.variants.productDetails === "both"
-  const allowCartDialog = config.variants.cart === "dialog" || config.variants.cart === "both"
   const allowCartRoute = config.variants.cart === "route" || config.variants.cart === "both"
 
   const productHref = useCallback((slug: string) => `${basePath}/products/${slug}`, [basePath])
@@ -96,9 +89,9 @@ export function StorefrontExperience({
     (product: StoreProduct, quantity: number, variantTitle?: string) => {
       if (isOutOfStock(product, variantTitle)) return
       void addToCartBase(toCartLine(product, quantity, variantTitle)).catch(() => {})
-      if (allowCartDialog) setCartOpen(true)
+      if (allowCartRoute) window.location.href = cartHref
     },
-    [addToCartBase, allowCartDialog, isOutOfStock],
+    [addToCartBase, allowCartRoute, isOutOfStock, cartHref],
   )
 
   const scrollToCollection = useCallback(() => {
@@ -373,8 +366,6 @@ export function StorefrontExperience({
         <div key={`${section.type}-${index}`}>{renderSection(section)}</div>
       ))}
 
-      <FloatingCart allowCartDialog={allowCartDialog} allowCartRoute={allowCartRoute} cartHref={cartHref} cartCount={cartCount} onOpen={() => setCartOpen(true)} />
-
       <Dialog
         open={detailOpen}
         onOpenChange={(open) => {
@@ -402,54 +393,6 @@ export function StorefrontExperience({
                 }}
               />
             </>
-          ) : null}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={cartOpen} onOpenChange={setCartOpen}>
-        <DialogContent
-          className={
-            config.variants.cartStyle === "cart-03"
-              ? "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-3xl"
-              : config.variants.cartStyle === "cart-02"
-                ? "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-2xl"
-                : "max-h-[88vh] max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-lg"
-          }
-          showCloseButton
-        >
-          <DialogHeader>
-            <DialogTitle>Your cart</DialogTitle>
-            <DialogDescription>Adjust quantities or remove items. Cart syncs with your active server cart session.</DialogDescription>
-          </DialogHeader>
-          {Object.keys(lines).length === 0 ? (
-            <p className="text-muted-foreground text-sm">Your cart is empty. Add any product from the collection.</p>
-          ) : (
-            <div
-              className={
-                config.variants.cartStyle === "cart-02"
-                  ? "border border-zinc-200 px-3"
-                  : config.variants.cartStyle === "cart-03"
-                    ? "flex flex-col gap-3"
-                    : "flex flex-col gap-3"
-              }
-            >
-              {Object.values(lines).map((line) => (
-                <CartLine
-                  key={line.id}
-                  variant={config.variants.cartStyle}
-                  line={line}
-                  onQuantityChange={(quantity) => setLineQty(line.id, quantity)}
-                  onRemove={() => removeLine(line.id)}
-                />
-              ))}
-            </div>
-          )}
-          {allowCartRoute ? (
-            <div className="flex justify-end">
-              <Button variant="outline" asChild>
-                <Link href={cartHref}>Open cart page</Link>
-              </Button>
-            </div>
           ) : null}
         </DialogContent>
       </Dialog>
@@ -767,34 +710,3 @@ function NoResults({ searchQuery, onReset }: { searchQuery: string; onReset: () 
   )
 }
 
-function FloatingCart({
-  allowCartDialog,
-  allowCartRoute,
-  cartHref,
-  cartCount,
-  onOpen,
-}: {
-  allowCartDialog: boolean
-  allowCartRoute: boolean
-  cartHref: string
-  cartCount: number
-  onOpen: () => void
-}) {
-  return (
-    <div className="fixed bottom-6 right-6 z-40">
-      <div className="relative flex items-center gap-2">
-        {allowCartRoute ? (
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href={cartHref}>Cart page</Link>
-          </Button>
-        ) : null}
-        <Button type="button" size="icon" className="size-14 rounded-full" onClick={onOpen} aria-label="Open cart" disabled={!allowCartDialog}>
-          <ShoppingBag className="size-6" />
-        </Button>
-        {cartCount > 0 ? (
-          <Badge className="absolute -right-1 -top-1 min-w-7 justify-center px-1.5">{cartCount > 99 ? "99+" : cartCount}</Badge>
-        ) : null}
-      </div>
-    </div>
-  )
-}

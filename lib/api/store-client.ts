@@ -16,7 +16,7 @@ const defaultVariants: StorefrontVariants = {
   categories: "list",
   productCards: "both",
   productDetails: "dialog",
-  cart: "dialog",
+  cart: "route",
   search: "panel",
   productPage: "editorial",
   cartStyle: "cart-02",

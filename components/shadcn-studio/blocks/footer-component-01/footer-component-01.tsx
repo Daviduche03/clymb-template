@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { Globe, Mail, MessageCircle, Phone } from 'lucide-react'
+import Link from "next/link"
+import { Mail } from "lucide-react"
 
-import { Separator } from '@/components/ui/separator'
+import { Separator } from "@/components/ui/separator"
 
-import Logo from '@/assets/svg/logo'
+import Logo from "@/assets/svg/logo"
 
 type FooterProps = {
   storeName?: string
@@ -13,59 +13,92 @@ type FooterProps = {
 
 const Footer = ({ storeName = "shadcn/studio", logoUrl, homeHref = "/" }: FooterProps) => {
   return (
-    <footer>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 max-md:flex-col sm:px-6 sm:py-6 md:gap-6 md:py-8">
-        <Link href={homeHref}>
-          <div className="flex items-center gap-3">
-            {logoUrl ? (
-              <img src={logoUrl} alt={storeName} className="h-8 w-auto" />
-            ) : (
-              <Logo className="gap-3" />
-            )}
+    <footer className="border-t bg-white">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="space-y-5">
+            <Link href={homeHref}>
+              {logoUrl ? (
+                <img src={logoUrl} alt={storeName} className="h-8 w-auto" />
+              ) : (
+                <Logo className="gap-3" />
+              )}
+            </Link>
+            <p className="max-w-xs text-sm leading-6 text-zinc-600">
+              {storeName} — thoughtfully designed essentials, delivered to your door.
+            </p>
           </div>
-        </Link>
 
-        <div className="flex items-center gap-5 whitespace-nowrap">
-          <a href="#" className="opacity-80 transition-opacity duration-300 hover:opacity-100">
-            About
-          </a>
-          <a href="#" className="opacity-80 transition-opacity duration-300 hover:opacity-100">
-            Support
-          </a>
-          <a href="#" className="opacity-80 transition-opacity duration-300 hover:opacity-100">
-            Terms
-          </a>
-          <a href="#" className="opacity-80 transition-opacity duration-300 hover:opacity-100">
-            Privacy
-          </a>
+          <div>
+            <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">Shop</h3>
+            <ul className="mt-4 space-y-3">
+              <li>
+                <a href="#collection" className="text-sm text-zinc-700 transition-colors hover:text-zinc-950">
+                  All products
+                </a>
+              </li>
+              <li>
+                <a href="#categories" className="text-sm text-zinc-700 transition-colors hover:text-zinc-950">
+                  Categories
+                </a>
+              </li>
+              <li>
+                <Link href={`${homeHref === "/" ? "" : homeHref}/cart`} className="text-sm text-zinc-700 transition-colors hover:text-zinc-950">
+                  Cart
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">Support</h3>
+            <ul className="mt-4 space-y-3">
+              <li>
+                <a href="#" className="text-sm text-zinc-700 transition-colors hover:text-zinc-950">
+                  Shipping
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-sm text-zinc-700 transition-colors hover:text-zinc-950">
+                  Returns
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-sm text-zinc-700 transition-colors hover:text-zinc-950">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">Stay in touch</h3>
+            <p className="mt-4 text-sm leading-6 text-zinc-600">New drops, restocks, and quiet seasonal edits.</p>
+            <a
+              href="#"
+              className="mt-4 inline-flex items-center gap-2 text-sm text-zinc-700 transition-colors hover:text-zinc-950"
+            >
+              <Mail className="h-4 w-4" />
+              hello@useclymb.com
+            </a>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <a href="#">
-            <Globe className="size-5" />
-          </a>
-          <a href="#">
-            <Mail className="size-5" />
-          </a>
-          <a href="#">
-            <MessageCircle className="size-5" />
-          </a>
-          <a href="#">
-            <Phone className="size-5" />
-          </a>
+        <Separator className="my-10" />
+
+        <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+          <p className="text-sm text-zinc-500">
+            &copy; {new Date().getFullYear()} {storeName}. All rights reserved.
+          </p>
+          <nav className="flex items-center gap-5 text-sm text-zinc-500">
+            <a href="#" className="transition-colors hover:text-zinc-900">
+              Privacy
+            </a>
+            <a href="#" className="transition-colors hover:text-zinc-900">
+              Terms
+            </a>
+          </nav>
         </div>
-      </div>
-
-      <Separator />
-
-      <div className="mx-auto flex max-w-7xl justify-center px-4 py-8 sm:px-6">
-        <p className="text-center font-medium text-balance">
-          {`© ${new Date().getFullYear()}`}{" "}
-          <Link href={homeHref} className="hover:underline">
-            {storeName}
-          </Link>
-          . Made with ❤️ for better web.
-        </p>
       </div>
     </footer>
   )
