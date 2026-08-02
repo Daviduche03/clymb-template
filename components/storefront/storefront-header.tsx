@@ -9,6 +9,7 @@ type StorefrontHeaderProps = {
   navigation: NavigationSection[]
   basePath: string
   className?: string
+  onOpenSearch?: () => void
 }
 
 export function StorefrontHeader({
@@ -16,6 +17,7 @@ export function StorefrontHeader({
   navigation,
   basePath,
   className,
+  onOpenSearch,
 }: StorefrontHeaderProps) {
   const homeHref = basePath || "/"
 
@@ -27,6 +29,7 @@ export function StorefrontHeader({
         storeName={store.name}
         homeHref={homeHref}
         className={className}
+        onOpenSearch={onOpenSearch}
       />
     )
   }
@@ -39,6 +42,7 @@ export function StorefrontHeader({
         storeName={store.name}
         homeHref={homeHref}
         className={className}
+        onOpenSearch={onOpenSearch}
       />
     )
   }
@@ -49,6 +53,7 @@ export function StorefrontHeader({
       logoUrl={store.theme?.logoUrl}
       homeHref={homeHref}
       className={className}
+      onOpenSearch={onOpenSearch}
     />
   )
 }

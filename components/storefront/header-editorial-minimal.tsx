@@ -18,6 +18,7 @@ type HeaderEditorialMinimalProps = {
   storeName?: string
   className?: string
   homeHref?: string
+  onOpenSearch?: () => void
 }
 
 export function HeaderEditorialMinimal({
@@ -26,6 +27,7 @@ export function HeaderEditorialMinimal({
   storeName,
   className,
   homeHref = "/",
+  onOpenSearch,
 }: HeaderEditorialMinimalProps) {
   const cartHref = `${homeHref === "/" ? "" : homeHref}/cart`
   const wordmark = storeName
@@ -61,6 +63,7 @@ export function HeaderEditorialMinimal({
 
           <button
             type="button"
+            onClick={onOpenSearch}
             className="hidden items-center gap-2 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-zinc-950 md:inline-flex"
           >
             <Search className="size-4" />

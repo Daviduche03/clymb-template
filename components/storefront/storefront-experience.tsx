@@ -3,7 +3,7 @@
 import Link from "next/link"
 import type { ReactNode } from "react"
 import { useCallback, useMemo, useState } from "react"
-import { ArrowRight, Search, X } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { CategoryCard } from "@/components/commercn/categories/category-01"
 import { CategoryListCard } from "@/components/commercn/categories/category-02"
 import { CategoryFour } from "@/components/commercn/categories/category-04"
@@ -13,13 +13,13 @@ import { ProductCardThree } from "@/components/commercn/product-cards/product-ca
 import { ProductCardFour } from "@/components/commercn/product-cards/product-card-04"
 import { ProductDetailOne } from "@/components/commercn/product-details/product-detail-01"
 import { CategorySectionSplit } from "@/components/storefront/category-section-split"
+import { SearchCommandPalette } from "@/components/storefront/search-command-palette"
 import ProductList from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { Pagination } from "@/components/ui/pagination"
 import {
   getDefaultStorefrontSections,
@@ -39,9 +39,13 @@ type SortOrder = "featured" | "price-asc" | "price-desc" | "name"
 export function StorefrontExperience({
   config,
   basePath = "",
+  searchOpen = false,
+  onSearchOpenChange,
 }: {
   config: StorefrontConfig
   basePath?: string
+  searchOpen?: boolean
+  onSearchOpenChange?: (open: boolean) => void
 }) {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selected, setSelected] = useState<StoreProduct | null>(null)
@@ -231,32 +235,8 @@ export function StorefrontExperience({
           <div className="grid gap-3 sm:grid-cols-3">
             <MetricCard label="Catalog size" value={config.products.length.toString()} description="Curated products ready for merchandising." />
             <MetricCard label="In stock" value={inStockCount.toString()} description="Items available for immediate checkout." />
-            <MetricCard label="Active filter" value={activeCategory ?? "All products"} description="Use filters to switch merchandising intent quickly." />
+            <MetricCard label="Active filter" value={activeCategory ?? "All products"} description="Use the header search to filter and sort the catalog." />
           </div>
-
-          {config.variants.search === "minimal" ? (
-            <MinimalSearchBar
-              searchQuery={searchQuery}
-              activeCategory={activeCategory}
-              categoryTags={categoryTags}
-              filteredCount={filteredProducts.length}
-              sortOrder={sortOrder}
-              onSearchChange={setSearchQuery}
-              onCategoryChange={setActiveCategory}
-              onSortChange={setSortOrder}
-            />
-          ) : (
-            <SearchPanel
-              searchQuery={searchQuery}
-              activeCategory={activeCategory}
-              categoryTags={categoryTags}
-              filteredCount={filteredProducts.length}
-              sortOrder={sortOrder}
-              onSearchChange={setSearchQuery}
-              onCategoryChange={setActiveCategory}
-              onSortChange={setSortOrder}
-            />
-          )}
         </div>
 
         {config.products.length === 0 ? (
@@ -366,6 +346,20 @@ export function StorefrontExperience({
         <div key={`${section.type}-${index}`}>{renderSection(section)}</div>
       ))}
 
+      <SearchCommandPalette
+        open={searchOpen}
+        onOpenChange={(open) => onSearchOpenChange?.(open)}
+        products={config.products}
+        productHref={productHref}
+        searchQuery={searchQuery}
+        activeCategory={activeCategory}
+        categoryTags={categoryTags}
+        sortOrder={sortOrder}
+        onSearchChange={setSearchQuery}
+        onCategoryChange={setActiveCategory}
+        onSortChange={setSortOrder}
+      />
+
       <Dialog
         open={detailOpen}
         onOpenChange={(open) => {
@@ -407,141 +401,6 @@ function MetricCard({ label, value, description }: { label: string; value: strin
       <p className="mt-2 text-2xl font-semibold text-zinc-950">{value}</p>
       <p className="mt-1 text-sm text-zinc-600">{description}</p>
     </div>
-  )
-}
-
-function SearchPanel(props: SearchUiProps) {
-  return (
-    <div className="border border-zinc-200 bg-(--store-panel) p-4 sm:p-5">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h4 className="text-sm font-semibold text-zinc-900 sm:text-base">Search, filter, and sort</h4>
-        <p className="text-xs text-zinc-500">{props.filteredCount} results</p>
-      </div>
-      <SearchInput searchQuery={props.searchQuery} onSearchChange={props.onSearchChange} />
-      <FilterChips {...props} />
-    </div>
-  )
-}
-
-function MinimalSearchBar(props: SearchUiProps) {
-  return (
-    <div className="border-y border-zinc-200 py-4">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="w-full max-w-xl">
-          <SearchInput searchQuery={props.searchQuery} onSearchChange={props.onSearchChange} minimal />
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em] text-zinc-500">
-          <span>{props.filteredCount} results</span>
-          <span className="hidden sm:inline">/</span>
-          <SortButtons sortOrder={props.sortOrder} onSortChange={props.onSortChange} minimal />
-        </div>
-      </div>
-      <div className="mt-4">
-        <CategoryButtons activeCategory={props.activeCategory} categoryTags={props.categoryTags} onCategoryChange={props.onCategoryChange} minimal />
-      </div>
-    </div>
-  )
-}
-
-type SearchUiProps = {
-  searchQuery: string
-  activeCategory: string | null
-  categoryTags: string[]
-  filteredCount: number
-  sortOrder: SortOrder
-  onSearchChange: (value: string) => void
-  onCategoryChange: (value: string | null) => void
-  onSortChange: (value: SortOrder) => void
-}
-
-function SearchInput({
-  searchQuery,
-  onSearchChange,
-  minimal = false,
-}: {
-  searchQuery: string
-  onSearchChange: (value: string) => void
-  minimal?: boolean
-}) {
-  return (
-    <div className="relative">
-      <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
-      <Input
-        type="text"
-        placeholder="Search products..."
-        value={searchQuery}
-        onChange={(event) => onSearchChange(event.target.value)}
-        className={minimal ? "h-11 rounded-none border-zinc-200 bg-white pl-11 pr-11" : "h-11 rounded-xl border-zinc-200 bg-white pl-11 pr-11"}
-      />
-      {searchQuery ? (
-        <button
-          type="button"
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
-          onClick={() => onSearchChange("")}
-          aria-label="Clear search"
-        >
-          <X className="size-4" />
-        </button>
-      ) : null}
-    </div>
-  )
-}
-
-function FilterChips(props: SearchUiProps) {
-  return (
-    <>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <CategoryButtons activeCategory={props.activeCategory} categoryTags={props.categoryTags} onCategoryChange={props.onCategoryChange} />
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <SortButtons sortOrder={props.sortOrder} onSortChange={props.onSortChange} />
-      </div>
-    </>
-  )
-}
-
-function CategoryButtons({
-  activeCategory,
-  categoryTags,
-  onCategoryChange,
-  minimal = false,
-}: {
-  activeCategory: string | null
-  categoryTags: string[]
-  onCategoryChange: (value: string | null) => void
-  minimal?: boolean
-}) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      <Button variant={activeCategory === null ? "default" : "outline"} size="sm" className={minimal ? "rounded-none" : "rounded-full"} onClick={() => onCategoryChange(null)}>
-        All
-      </Button>
-      {categoryTags.map((tag) => (
-        <Button key={tag} variant={activeCategory === tag ? "default" : "outline"} size="sm" className={minimal ? "rounded-none" : "rounded-full"} onClick={() => onCategoryChange(activeCategory === tag ? null : tag)}>
-          {tag}
-        </Button>
-      ))}
-    </div>
-  )
-}
-
-function SortButtons({
-  sortOrder,
-  onSortChange,
-  minimal = false,
-}: {
-  sortOrder: SortOrder
-  onSortChange: (value: SortOrder) => void
-  minimal?: boolean
-}) {
-  const buttonClass = minimal ? "rounded-none px-0 hover:bg-transparent" : "rounded-full"
-  return (
-    <>
-      <Button variant={sortOrder === "featured" ? "secondary" : "outline"} size="sm" className={buttonClass} onClick={() => onSortChange("featured")}>Featured</Button>
-      <Button variant={sortOrder === "price-asc" ? "secondary" : "outline"} size="sm" className={buttonClass} onClick={() => onSortChange("price-asc")}>Price: Low to high</Button>
-      <Button variant={sortOrder === "price-desc" ? "secondary" : "outline"} size="sm" className={buttonClass} onClick={() => onSortChange("price-desc")}>Price: High to low</Button>
-      <Button variant={sortOrder === "name" ? "secondary" : "outline"} size="sm" className={buttonClass} onClick={() => onSortChange("name")}>Name</Button>
-    </>
   )
 }
 

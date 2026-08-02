@@ -16,6 +16,7 @@ type HeaderPerformanceProps = {
   storeName?: string
   className?: string
   homeHref?: string
+  onOpenSearch?: () => void
 }
 
 export function HeaderPerformance({
@@ -24,6 +25,7 @@ export function HeaderPerformance({
   storeName,
   className,
   homeHref = "/",
+  onOpenSearch,
 }: HeaderPerformanceProps) {
   const cartHref = `${homeHref === "/" ? "" : homeHref}/cart`
   const wordmark = storeName ? storeName.replace(/\s+/g, " ").trim().toUpperCase() : "APEX."
@@ -34,6 +36,7 @@ export function HeaderPerformance({
         <div className="hidden flex-1 items-center md:flex">
           <button
             type="button"
+            onClick={onOpenSearch}
             className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.02em] text-zinc-600 transition-colors hover:text-zinc-950"
           >
             <Search className="size-4" />

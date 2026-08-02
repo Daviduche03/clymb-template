@@ -26,15 +26,17 @@ type HeaderProps = {
   logoUrl?: string
   className?: string
   homeHref?: string
+  onOpenSearch?: () => void
 }
 
-const Header = ({ navigationData, logoUrl, className, homeHref = "/" }: HeaderProps) => {
+const Header = ({ navigationData, logoUrl, className, homeHref = "/", onOpenSearch }: HeaderProps) => {
   return (
     <header className={cn('bg-background/95 sticky top-0 z-50 border-b backdrop-blur-sm', className)}>
       <div className='mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8'>
         <div className='hidden min-w-0 flex-1 items-center md:flex'>
           <button
             type='button'
+            onClick={onOpenSearch}
             className='text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-xs font-medium tracking-[0.02em] transition-colors'
           >
             <Search className='size-4' />

@@ -1,3 +1,5 @@
+"use client"
+
 import { PromoBannerOne } from "@/components/commercn/promo-banners/promo-banner-01"
 import { PromoBannerThree } from "@/components/commercn/promo-banners/promo-banner-03"
 import { HeroSectionEditorial } from "@/components/storefront/hero-section-editorial"
@@ -5,6 +7,7 @@ import { StorefrontHeader } from "@/components/storefront/storefront-header"
 import { StorefrontExperience } from "@/components/storefront/storefront-experience"
 import { StoreAnalyticsTracker } from "@/components/storefront/store-analytics-tracker"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
+import { useState } from "react"
 import HeroSection01 from "@/components/shadcn-studio/blocks/hero-section-01/hero-section-01"
 import HeroSection41 from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
 import type { MenuData } from "@/components/shadcn-studio/blocks/hero-section-41/hero-section-41"
@@ -115,6 +118,7 @@ export function StorefrontPage({
   basePath: string
 }) {
   const navigation = mapNavigationForStore(basePath, store.navigation)
+  const [searchOpen, setSearchOpen] = useState(false)
 
   return (
     <StoreThemeProvider config={store}>
@@ -123,10 +127,10 @@ export function StorefrontPage({
         {store.variants.banner === "promo-03" ? <PromoBannerThree /> : null}
         {store.variants.banner === "promo-01" ? <PromoBannerOne /> : null}
 
-        <StorefrontHeader store={store} navigation={navigation} basePath={basePath} />
+        <StorefrontHeader store={store} navigation={navigation} basePath={basePath} onOpenSearch={() => setSearchOpen(true)} />
         <HeroSectionVariant store={store} />
 
-        <StorefrontExperience config={store} basePath={basePath} />
+        <StorefrontExperience config={store} basePath={basePath} searchOpen={searchOpen} onSearchOpenChange={setSearchOpen} />
         <FooterVariant store={store} basePath={basePath} />
       </main>
     </StoreThemeProvider>
