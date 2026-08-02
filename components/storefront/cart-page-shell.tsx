@@ -4,6 +4,7 @@ import Link from "next/link"
 import { CartLine } from "@/components/commercn/carts/cart-line"
 import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
 import { Button } from "@/components/ui/button"
+import { CartPageShellRoute2 } from "@/components/storefront/cart-page-shell-route-2"
 import type { StorefrontConfig } from "@/lib/types"
 
 type CartPageShellProps = {
@@ -28,6 +29,21 @@ export function CartPageShell({
   onRemove,
 }: CartPageShellProps) {
   const cartStyle = store.variants.cartStyle
+
+  if (store.variants.cart === "route-2") {
+    return (
+      <CartPageShellRoute2
+        lines={lines}
+        lineCount={lineCount}
+        cartTotal={cartTotal}
+        storeName={store.name}
+        continueHref={continueHref}
+        checkoutHref={checkoutHref}
+        onQuantityChange={onQuantityChange}
+        onRemove={onRemove}
+      />
+    )
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">

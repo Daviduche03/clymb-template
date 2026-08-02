@@ -30,7 +30,7 @@ export type StorefrontVariants = {
   categories: "cards" | "list" | "circle" | "split"
   productCards: "none" | "product-card-01" | "product-card-02" | "product-card-03" | "product-card-04" | "both"
   productDetails: "dialog" | "route" | "both"
-  cart: "dialog" | "route" | "both"
+  cart: "dialog" | "route" | "route-2" | "both"
   search: "panel" | "minimal"
   productPage: "editorial" | "split"
   cartStyle: "cart-01" | "cart-02" | "cart-03"

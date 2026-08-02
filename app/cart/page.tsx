@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import { CartPageShell } from "@/components/storefront/cart-page-shell"
+import { CartPageSkeleton } from "@/components/storefront/cart-page-skeleton"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
 import { useCart } from "@/hooks/use-cart"
 import { mapNavigationForStore } from "@/lib/types"
@@ -12,7 +13,7 @@ import { DEFAULT_STORE_ID, getStorefrontConfig } from "@/lib/api/store-client"
 function CartPageContent({ store }: { store: StorefrontConfig }) {
   const { lines, cartTotal, setLineQty, removeLine, isLoaded } = useCart(store.id)
 
-  if (!isLoaded) return null
+  if (!isLoaded) return <CartPageSkeleton />
 
   const cartLines = Object.values(lines)
   const lineCount = cartLines.reduce((sum, line) => sum + line.quantity, 0)
@@ -50,7 +51,7 @@ export default function CartPage() {
     })
   }, [])
 
-  if (!store) return null
+  if (!store) return <CartPageSkeleton />
 
   return <CartPageContent store={store} />
 }

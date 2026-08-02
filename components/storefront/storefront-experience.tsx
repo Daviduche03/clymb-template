@@ -59,7 +59,7 @@ export function StorefrontExperience({
 
   const allowDetailDialog = config.variants.productDetails === "dialog" || config.variants.productDetails === "both"
   const allowDetailRoute = config.variants.productDetails === "route" || config.variants.productDetails === "both"
-  const allowCartRoute = config.variants.cart === "route" || config.variants.cart === "both"
+  const allowCartRoute = config.variants.cart === "route" || config.variants.cart === "route-2" || config.variants.cart === "both"
 
   const productHref = useCallback((slug: string) => `${basePath}/products/${slug}`, [basePath])
   const cartHref = `${basePath}/cart`
