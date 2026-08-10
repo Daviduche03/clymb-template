@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import { CartPageShell } from "@/components/storefront/cart-page-shell"
 import { CartPageSkeleton } from "@/components/storefront/cart-page-skeleton"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
+import { StorefrontHeader } from "@/components/storefront/storefront-header"
 import { useCart } from "@/hooks/use-cart"
 import { mapNavigationForStore } from "@/lib/types"
 import type { StorefrontConfig } from "@/lib/types"
@@ -17,14 +17,14 @@ function CartPageContent({ store }: { store: StorefrontConfig }) {
 
   const cartLines = Object.values(lines)
   const lineCount = cartLines.reduce((sum, line) => sum + line.quantity, 0)
-  const navigation = mapNavigationForStore("", store.navigation)
+  const navigation = mapNavigationForStore(store.navigation)
 
   return (
     <StoreThemeProvider config={store}>
       <main className="min-h-screen bg-white text-zinc-900">
-        <Header
-          navigationData={navigation}
-          logoUrl={store.theme?.logoUrl}
+        <StorefrontHeader
+          store={store}
+          navigation={navigation}
           className="border-zinc-200 bg-white"
         />
         <CartPageShell
@@ -33,7 +33,7 @@ function CartPageContent({ store }: { store: StorefrontConfig }) {
           lineCount={lineCount}
           cartTotal={cartTotal}
           continueHref="/"
-          checkoutHref={`/stores/${store.id}/checkout`}
+          checkoutHref="/checkout"
           onQuantityChange={setLineQty}
           onRemove={removeLine}
         />

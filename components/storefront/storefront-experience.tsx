@@ -4,14 +4,14 @@ import Link from "next/link"
 import type { ReactNode } from "react"
 import { useCallback, useMemo, useState } from "react"
 import { ArrowRight } from "lucide-react"
-import { CategoryCard } from "@/components/commercn/categories/category-01"
-import { CategoryListCard } from "@/components/commercn/categories/category-02"
-import { CategoryFour } from "@/components/commercn/categories/category-04"
-import { ProductCardOne } from "@/components/commercn/product-cards/product-card-01"
-import { ProductCardTwo } from "@/components/commercn/product-cards/product-card-02"
-import { ProductCardThree } from "@/components/commercn/product-cards/product-card-03"
-import { ProductCardFour } from "@/components/commercn/product-cards/product-card-04"
-import { ProductDetailOne } from "@/components/commercn/product-details/product-detail-01"
+import { CategoryCard } from "@/components/storefront/category-card"
+import { CategoryCircle } from "@/components/storefront/category-circle"
+import { ProductCardBold } from "@/components/storefront/product-card-bold"
+import { ProductCardWide } from "@/components/storefront/product-card-wide"
+import { ProductDetailOne } from "@/components/storefront/product-detail-one"
+import { ProductDetailTwo } from "@/components/storefront/product-detail-two"
+import { ProductDetailThree } from "@/components/storefront/product-detail-three"
+import { CategoryListEditorial } from "@/components/storefront/category-list-editorial"
 import { CategorySectionSplit } from "@/components/storefront/category-section-split"
 import { SearchCommandPalette } from "@/components/storefront/search-command-palette"
 import ProductList from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
@@ -38,12 +38,10 @@ type SortOrder = "featured" | "price-asc" | "price-desc" | "name"
 
 export function StorefrontExperience({
   config,
-  basePath = "",
   searchOpen = false,
   onSearchOpenChange,
 }: {
   config: StorefrontConfig
-  basePath?: string
   searchOpen?: boolean
   onSearchOpenChange?: (open: boolean) => void
 }) {
@@ -65,8 +63,8 @@ export function StorefrontExperience({
   const allowDetailRoute = config.variants.productDetails === "route" || config.variants.productDetails === "both"
   const allowCartRoute = config.variants.cart === "route" || config.variants.cart === "route-2" || config.variants.cart === "both"
 
-  const productHref = useCallback((slug: string) => `${basePath}/products/${slug}`, [basePath])
-  const cartHref = `${basePath}/cart`
+  const productHref = useCallback((slug: string) => `/products/${slug}`, [])
+  const cartHref = "/cart"
 
   const getInventory = useCallback((product: StoreProduct, variantTitle?: string) => {
     if (product.variants && product.variants.length > 0) {
@@ -190,40 +188,6 @@ export function StorefrontExperience({
     [scrollToCollection],
   )
 
-  const renderCard = useCallback(
-    (product: StoreProduct) => {
-      const detail = productToDetailModel(product)
-      const cardProps = {
-        id: product.slug,
-        name: detail.name,
-        category: detail.category,
-        description: detail.description,
-        price: detail.currentPrice,
-        image: detail.images[0],
-        isInCart: Boolean(lines[product.slug]),
-        isOutOfStock: isOutOfStock(product),
-        lowStockText: isLowStock(product) ? `Only ${getInventory(product)} left` : undefined,
-        onClick: () => {
-          if (allowDetailRoute) window.location.href = productHref(product.slug)
-          else if (allowDetailDialog) onProductClick(product)
-        },
-        onAddToCart: () => addToCart(product, 1),
-      }
-
-      switch (config.variants.productCards) {
-        case "product-card-01":
-          return <ProductCardOne key={product.slug} {...cardProps} />
-        case "product-card-03":
-          return <ProductCardThree key={product.slug} {...cardProps} />
-        case "product-card-04":
-          return <ProductCardFour key={product.slug} {...cardProps} />
-        default:
-          return <ProductCardTwo key={product.slug} {...cardProps} />
-      }
-    },
-    [addToCart, allowDetailDialog, allowDetailRoute, config.variants.productCards, getInventory, isLowStock, isOutOfStock, lines, onProductClick, productHref],
-  )
-
   const renderSearchControls = (perPage: number, gridVariant: "grid-01" | "grid-02" = "grid-01") => {
     const totalPages = Math.max(1, Math.ceil(filteredProducts.length / perPage))
     const pageStart = (currentPage - 1) * perPage
@@ -297,7 +261,15 @@ export function StorefrontExperience({
           title={section.title ?? "Featured products"}
           description={section.description ?? "Spotlight items picked for high-intent shopping moments."}
           products={config.products.slice(0, section.limit ?? 3)}
-          renderCard={renderCard}
+          productHref={productHref}
+          allowDetailDialog={allowDetailDialog}
+          onProductClick={onProductClick}
+          addToCart={addToCart}
+          isProductWishlisted={isProductWishlisted}
+          toggleProductWishlist={toggleProductWishlist}
+          lines={lines}
+          isOutOfStock={isOutOfStock}
+          isLowStock={isLowStock}
         />
       ),
       merchandising: (section) => (
@@ -320,7 +292,7 @@ export function StorefrontExperience({
         />
       ),
       "collection-grid": (section) => (
-        <div key="collection-grid" id="collection" className="bg-white pb-16 sm:pb-20">
+        <div key="collection-grid" id="collection" className="bg-white">
           {renderSearchControls(section.perPage ?? 6, section.variant ?? "grid-01")}
         </div>
       ),
@@ -377,15 +349,35 @@ export function StorefrontExperience({
                   </Button>
                 </div>
               ) : null}
-              <ProductDetailOne
-                product={detailModel}
-                variant={config.variants.productPage}
-                className="mx-auto max-w-none p-0 sm:p-0"
-                onAddToCart={(quantity, size) => {
-                  if (selected) addToCart(selected, quantity, size)
-                  setDetailOpen(false)
-                }}
-              />
+              {config.variants.productPage === "gallery-sticky-left" ? (
+                <ProductDetailTwo
+                  product={detailModel}
+                  className="mx-auto max-w-none p-0 sm:p-0"
+                  onAddToCart={(quantity, size) => {
+                    if (selected) addToCart(selected, quantity, size)
+                    setDetailOpen(false)
+                  }}
+                />
+              ) : config.variants.productPage === "gallery-sticky-right" ? (
+                <ProductDetailThree
+                  product={detailModel}
+                  className="mx-auto max-w-none p-0 sm:p-0"
+                  onAddToCart={(quantity, size) => {
+                    if (selected) addToCart(selected, quantity, size)
+                    setDetailOpen(false)
+                  }}
+                />
+              ) : (
+                <ProductDetailOne
+                  product={detailModel}
+                  variant={config.variants.productPage}
+                  className="mx-auto max-w-none p-0 sm:p-0"
+                  onAddToCart={(quantity, size) => {
+                    if (selected) addToCart(selected, quantity, size)
+                    setDetailOpen(false)
+                  }}
+                />
+              )}
             </>
           ) : null}
         </DialogContent>
@@ -447,15 +439,14 @@ function CategoriesSection({
         ) : null}
 
         {config.variants.categories === "list" ? (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {config.categories.map((category) => (
-              <CategoryListCard key={category.id} title={category.title} count={category.count || ""} imageSrc={category.image || ""} onClick={() => selectCategory(category)} />
-            ))}
-          </div>
+          <CategoryListEditorial
+            categories={config.categories}
+            onSelect={selectCategory}
+          />
         ) : null}
 
         {config.variants.categories === "circle" ? (
-          <CategoryFour categories={config.categories.map((category) => ({ title: category.title, image: category.image, status: category.title.toLowerCase().includes("new") ? "live" : "default", onClick: () => selectCategory(category) }))} />
+          <CategoryCircle categories={config.categories.map((category) => ({ title: category.title, image: category.image, onClick: () => selectCategory(category) }))} />
         ) : null}
 
         {config.variants.categories === "split" ? (
@@ -470,21 +461,63 @@ function FeaturedProductsSection({
   title,
   description,
   products,
-  renderCard,
+  productHref,
+  allowDetailDialog,
+  onProductClick,
+  addToCart,
+  isProductWishlisted,
+  toggleProductWishlist,
+  lines,
+  isOutOfStock,
+  isLowStock,
 }: {
   title: string
   description: string
   products: StoreProduct[]
-  renderCard: (product: StoreProduct) => React.ReactNode
+  productHref: (slug: string) => string
+  allowDetailDialog: boolean
+  onProductClick: (product: StoreProduct) => void
+  addToCart: (product: StoreProduct, quantity: number) => void
+  isProductWishlisted: (product: { name: string }) => boolean
+  toggleProductWishlist: (product: { name: string }) => void
+  lines: Record<string, { quantity: number }>
+  isOutOfStock: (product: StoreProduct) => boolean
+  isLowStock: (product: StoreProduct) => boolean
 }) {
   return (
     <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-zinc-500">Featured edit</p>
         <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-zinc-950">{title}</h3>
-        <p className="mb-6 mt-2 max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">{description}</p>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {products.map(renderCard)}
+        <p className="mb-8 mt-2 max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">{description}</p>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {products.map((product, index) =>
+            index % 2 === 0 ? (
+              <ProductCardBold
+                key={product.slug}
+                product={{ ...product, href: productHref(product.slug) }}
+                onProductClick={allowDetailDialog ? (p) => onProductClick(p as StoreProduct) : undefined}
+                onAddToCart={(p) => addToCart(p as StoreProduct, 1)}
+                isWishlisted={isProductWishlisted}
+                onToggleWishlist={toggleProductWishlist}
+                isInCart={(p) => !!lines[p.slug]}
+                isOutOfStock={(p) => isOutOfStock(p as StoreProduct)}
+                isLowStock={(p) => isLowStock(p as StoreProduct)}
+              />
+            ) : (
+              <ProductCardWide
+                key={product.slug}
+                product={{ ...product, href: productHref(product.slug) }}
+                onProductClick={allowDetailDialog ? (p) => onProductClick(p as StoreProduct) : undefined}
+                onAddToCart={(p) => addToCart(p as StoreProduct, 1)}
+                isWishlisted={isProductWishlisted}
+                onToggleWishlist={toggleProductWishlist}
+                isInCart={(p) => !!lines[p.slug]}
+                isOutOfStock={(p) => isOutOfStock(p as StoreProduct)}
+                isLowStock={(p) => isLowStock(p as StoreProduct)}
+              />
+            ),
+          )}
         </div>
       </div>
     </section>
@@ -508,9 +541,9 @@ function MerchandisingSection(props: {
   isLowStock: (product: StoreProduct) => boolean
 }) {
   return (
-    <section className="bg-white px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+    <section className="bg-white py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-zinc-500">Merchandising</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-zinc-950">{props.title}</h3>
@@ -524,28 +557,29 @@ function MerchandisingSection(props: {
             ))}
           </div>
         </div>
+      </div>
 
-        {props.products.length === 0 ? (
+      {props.products.length === 0 ? (
+        <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-8 text-center">
             <p className="text-base font-medium text-zinc-900">No products in this merchandising bucket yet.</p>
             <p className="mt-1 text-sm text-zinc-600">Try another tab or add products with sale/new metadata.</p>
           </div>
-        ) : (
-          <ProductList
-            products={props.products.map((product) => ({ ...product, href: props.productHref(product.slug) }))}
-            badge="Merchandising"
-            title={props.title}
-            compact
-            onProductClick={props.allowDetailDialog ? (product) => props.onProductClick(product as StoreProduct) : undefined}
-            onAddToCart={(product) => props.addToCart(product as StoreProduct, 1)}
-            isWishlisted={props.isProductWishlisted}
-            onToggleWishlist={props.toggleProductWishlist}
-            isInCart={(product) => !!props.lines[product.slug]}
-            isOutOfStock={(product) => props.isOutOfStock(product as StoreProduct)}
-            isLowStock={(product) => props.isLowStock(product as StoreProduct)}
-          />
-        )}
-      </div>
+        </div>
+      ) : (
+        <ProductList
+          products={props.products.map((product) => ({ ...product, href: props.productHref(product.slug) }))}
+          hideHeader
+          compact
+          onProductClick={props.allowDetailDialog ? (product) => props.onProductClick(product as StoreProduct) : undefined}
+          onAddToCart={(product) => props.addToCart(product as StoreProduct, 1)}
+          isWishlisted={props.isProductWishlisted}
+          onToggleWishlist={props.toggleProductWishlist}
+          isInCart={(product) => !!props.lines[product.slug]}
+          isOutOfStock={(product) => props.isOutOfStock(product as StoreProduct)}
+          isLowStock={(product) => props.isLowStock(product as StoreProduct)}
+        />
+      )}
     </section>
   )
 }

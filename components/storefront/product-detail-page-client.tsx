@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { ProductDetailOne } from "@/components/commercn/product-details/product-detail-01"
+import { ProductDetailOne } from "@/components/storefront/product-detail-one"
+import { ProductDetailTwo } from "@/components/storefront/product-detail-two"
+import { ProductDetailThree } from "@/components/storefront/product-detail-three"
 import ProductList from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
 import { useCart } from "@/hooks/use-cart"
 import {
@@ -19,19 +21,17 @@ type ProductDetailPageClientProps = {
   store: StorefrontConfig
   product: StoreProduct
   relatedProducts: StoreProduct[]
-  basePath?: string
 }
 
 export function ProductDetailPageClient({
   store,
   product,
   relatedProducts,
-  basePath = "",
 }: ProductDetailPageClientProps) {
   const { addToCart } = useCart(store.id)
-  const navigation = mapNavigationForStore(basePath, store.navigation)
-  const cartHref = `${basePath}/cart`
-  const storeHref = basePath || "/"
+  const navigation = mapNavigationForStore(store.navigation)
+  const cartHref = "/cart"
+  const storeHref = "/"
 
   return (
     <main className="min-h-screen bg-white text-zinc-900">
@@ -39,7 +39,6 @@ export function ProductDetailPageClient({
       <StorefrontHeader
         store={store}
         navigation={navigation}
-        basePath={basePath}
         className="border-zinc-200 bg-white"
       />
 
@@ -63,12 +62,27 @@ export function ProductDetailPageClient({
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8">
-        <ProductDetailOne
-          product={productToDetailModel(product)}
-          variant={store.variants.productPage}
-          onAddToCart={(quantity, size) => addToCart(toCartLine(product, quantity, size))}
-        />
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {store.variants.productPage === "gallery-sticky-left" ? (
+          <ProductDetailTwo
+            product={productToDetailModel(product)}
+            className="mx-auto max-w-none"
+            onAddToCart={(quantity, size) => addToCart(toCartLine(product, quantity, size))}
+          />
+        ) : store.variants.productPage === "gallery-sticky-right" ? (
+          <ProductDetailThree
+            product={productToDetailModel(product)}
+            className="mx-auto max-w-none"
+            onAddToCart={(quantity, size) => addToCart(toCartLine(product, quantity, size))}
+          />
+        ) : (
+          <ProductDetailOne
+            product={productToDetailModel(product)}
+            variant={store.variants.productPage}
+            className="mx-auto max-w-none"
+            onAddToCart={(quantity, size) => addToCart(toCartLine(product, quantity, size))}
+          />
+        )}
       </div>
 
       {relatedProducts.length > 0 ? (
@@ -79,7 +93,7 @@ export function ProductDetailPageClient({
             variant={store.variants.header === "header-03" ? "grid-02" : "grid-01"}
             products={relatedProducts.map((entry) => ({
               ...entry,
-              href: `${basePath}/products/${entry.slug}`,
+              href: `/products/${entry.slug}`,
             }))}
           />
         </div>

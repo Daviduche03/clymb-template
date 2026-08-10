@@ -73,9 +73,6 @@ export function HeaderPerformance({
         </div>
 
         <div className="hidden flex-1 items-center justify-end gap-5 md:flex">
-          <button type="button" className="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-950">
-            Account
-          </button>
           <Link href={cartHref} className="inline-flex items-center gap-2 text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-950">
             Cart
             <ShoppingBag className="size-4" />

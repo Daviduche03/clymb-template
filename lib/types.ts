@@ -1,7 +1,42 @@
 import type { NavigationSection } from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import type { ProductItem } from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
-import type { ProductDetailModel } from "@/components/commercn/product-details/product-detail-01"
+
+export type ShoppingCartLine = {
+  id: string
+  name: string
+  category: string
+  image: string
+  price: number
+  quantity: number
+  productId?: string
+  variantId?: string
+  variantTitle?: string
+  cartItemId?: string
+  sku?: string
+  currency?: string
+}
+
+export type ShoppingCartLineProps = {
+  line?: ShoppingCartLine
+  onQuantityChange?: (quantity: number) => void
+  onRemove?: () => void
+  className?: string
+}
+
+export type ProductDetailModel = {
+  name: string
+  description: string
+  category: string
+  images: string[]
+  sizes: string[]
+  currency: string
+  /** Price shown as the main (sale) price */
+  currentPrice: number
+  /** Optional list / MSRP price */
+  compareAtPrice?: number
+  stockMessage?: string
+  sizeAvailability?: Record<string, number>
+}
 
 export type StoreProduct = ProductItem & {
   id?: string
@@ -25,14 +60,13 @@ export type StoreCategory = {
 
 export type StorefrontVariants = {
   banner: "none" | "promo-01" | "promo-03"
-  header: "header-01" | "header-02" | "header-03"
-  hero: "custom" | "hero-section-01" | "hero-section-41" | "hero-editorial"
+  header: "header-01" | "header-02" | "header-03" | "header-04"
+  hero: "custom" | "hero-section-01" | "hero-section-41" | "hero-editorial" | "hero-lookbook" | "hero-full-bleed"
   categories: "cards" | "list" | "circle" | "split"
-  productCards: "none" | "product-card-01" | "product-card-02" | "product-card-03" | "product-card-04" | "both"
   productDetails: "dialog" | "route" | "both"
-  cart: "dialog" | "route" | "route-2" | "both"
+  cart: "route" | "route-2" | "both"
   search: "panel" | "minimal"
-  productPage: "editorial" | "split"
+  productPage: "editorial" | "split" | "gallery-sticky-left" | "gallery-sticky-right"
   cartStyle: "cart-01" | "cart-02" | "cart-03"
   footer: "footer-01" | "footer-02" | "footer-03"
 }
@@ -73,12 +107,8 @@ export function getDefaultStorefrontSections(config: StorefrontConfig): Storefro
   ]
 }
 
-export function mapNavigationForStore(basePath: string, nav: NavigationSection[]): NavigationSection[] {
-  return nav.map((item) => {
-    if (item.href === "/") return { ...item, href: basePath || "/" }
-    if (item.href === "/cart") return { ...item, href: `${basePath}/cart` }
-    return item
-  })
+export function mapNavigationForStore(nav: NavigationSection[]): NavigationSection[] {
+  return nav
 }
 
 export function productToDetailModel(product: StoreProduct): ProductDetailModel {

@@ -31,21 +31,20 @@ Injected automatically by the Clymb orchestrator into `/workspace/.env.local`:
 ## Storefront Layout
 
 ```
-/stores/[store]/           ← Storefront home (hero, categories, products)
-/stores/[store]/cart       ← Cart page
-/stores/[store]/checkout   ← Checkout page
-/stores/[store]/products/[slug]  ← Product detail page
-/stores/[store]/orders/[orderId] ← Order confirmation
+/                              ← Storefront home (hero, categories, products)
+/cart                          ← Cart page
+/checkout                      ← Checkout page
+/products/[slug]               ← Product detail page
+/orders/[orderId]              ← Order confirmation
 ```
 
-The storefront fetches data through `/api/store/[...path]` which proxies to the Clymb backend API (server-side, no CORS issues).
+The storefront renders the store selected by `NEXT_PUBLIC_STORE_ID` and fetches data through `/api/store/[...path]` which proxies to the Clymb backend API (server-side, no CORS issues).
 
 ## Storefront Architecture
 
 - **`lib/api/store-client.ts`** — Client that fetches store config, products, cart, and orders from the API
 - **`lib/types.ts`** — TypeScript types for StorefrontConfig, variants, sections, products
-- **`components/storefront/`** — Storefront page shell, section rendering, headers, hero
-- **`components/commercn/`** — Commerce components (product cards, PDP, carts, checkout)
+- **`components/storefront/`** — Storefront page shell, section rendering, headers, hero, commerce components (carts, PDP, promo banners, orders)
 - **`components/shadcn-studio/blocks/`** — Pre-built section blocks (heroes, product lists, footers)
 
 ## Section Registry

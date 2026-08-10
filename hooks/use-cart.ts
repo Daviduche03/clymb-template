@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
+import type { ShoppingCartLine } from "@/lib/types"
 import { getCart, addToCart, updateCartItem, deleteCartItem, getStore, StoreApiError } from "@/lib/api/store-client"
 
 const CART_SESSION_KEY_PREFIX = "storefront_cart_session_v1"

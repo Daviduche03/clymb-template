@@ -24,6 +24,7 @@ type ProductProps = {
 	title?: string
 	badge?: string
 	compact?: boolean
+	hideHeader?: boolean
 	variant?: "grid-01" | "grid-02"
 	onProductClick?: (product: ProductItem) => void
 	onAddToCart?: (product: ProductItem) => void
@@ -39,6 +40,7 @@ const ProductList = ({
 	title = "All New Collection",
 	badge,
 	compact = false,
+	hideHeader = false,
 	variant = "grid-01",
 	onProductClick,
 	onAddToCart,
@@ -56,10 +58,12 @@ const ProductList = ({
 					compact ? "space-y-6 sm:space-y-8 lg:space-y-10" : "space-y-14 sm:space-y-16 lg:space-y-20",
 				)}
 			>
+					{!hideHeader ? (
 					<div className={cn(compact ? "space-y-2" : "space-y-4")}>
 						{badge && <p className="text-[0.72rem] uppercase tracking-[0.24em] text-zinc-500">{badge}</p>}
 						<h2 className="text-2xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-3xl lg:text-4xl">{title}</h2>
 					</div>
+				) : null}
 
 				<div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3", variant === "grid-02" ? "gap-x-4 gap-y-12" : "gap-x-5 gap-y-10")}>
 					{products.map((product, index) => (

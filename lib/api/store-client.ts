@@ -11,21 +11,20 @@ export const DEFAULT_STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "default"
 
 const defaultVariants: StorefrontVariants = {
   banner: "none",
-  header: "header-01",
-  hero: "custom",
+  header: "header-04",
+  hero: "hero-full-bleed",
   categories: "list",
-  productCards: "both",
   productDetails: "dialog",
-  cart: "route-2",
+  cart: "route",
   search: "panel",
-  productPage: "editorial",
+  productPage: "gallery-sticky-left",
   cartStyle: "cart-02",
   footer: "footer-01",
 }
 
 const defaultNavigation: NavigationSection[] = [
   { title: "Home", href: "/" },
-  { title: "Shop", href: "#collection" },
+  { title: "Shop", href: "/#collection" },
   { title: "Cart", href: "/cart" },
 ]
 

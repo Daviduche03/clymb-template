@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { ShieldCheck, Truck } from "lucide-react"
 import { CartRoute2Empty, CartRoute2Line } from "@/components/storefront/cart-line-route-2"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
+import type { ShoppingCartLine } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 

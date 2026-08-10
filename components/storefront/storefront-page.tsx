@@ -1,8 +1,9 @@
 "use client"
 
-import { PromoBannerOne } from "@/components/commercn/promo-banners/promo-banner-01"
-import { PromoBannerThree } from "@/components/commercn/promo-banners/promo-banner-03"
+import { PromoBannerOne, PromoBannerThree } from "@/components/storefront/promo-banner"
 import { HeroSectionEditorial } from "@/components/storefront/hero-section-editorial"
+import { HeroFullBleed } from "@/components/storefront/hero-full-bleed"
+import { HeroLookbook } from "@/components/storefront/hero-lookbook"
 import { StorefrontHeader } from "@/components/storefront/storefront-header"
 import { StorefrontExperience } from "@/components/storefront/storefront-experience"
 import { StoreAnalyticsTracker } from "@/components/storefront/store-analytics-tracker"
@@ -72,6 +73,14 @@ function HeroSectionVariant({ store }: { store: StorefrontConfig }) {
     return <HeroSectionEditorial badge={store.heroBadge} title={store.heroTitle} description={store.heroDescription} image={store.heroImage} />
   }
 
+  if (store.variants.hero === "hero-lookbook") {
+    return <HeroLookbook badge={store.heroBadge} title={store.heroTitle} description={store.heroDescription} image={store.heroImage} />
+  }
+
+  if (store.variants.hero === "hero-full-bleed") {
+    return <HeroFullBleed badge={store.heroBadge} title={store.heroTitle} description={store.heroDescription} image={store.heroImage} />
+  }
+
   return (
     <section className="relative overflow-hidden border-b bg-white px-4 py-20 sm:px-6 lg:px-8">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,var(--color-indigo-100),transparent_55%)] dark:bg-[radial-gradient(circle_at_top_right,var(--color-indigo-950),transparent_55%)]/[30]" />
@@ -97,9 +106,9 @@ function HeroSectionVariant({ store }: { store: StorefrontConfig }) {
   )
 }
 
-function FooterVariant({ store, basePath }: { store: StorefrontConfig; basePath: string }) {
-  const homeHref = basePath || "/"
-  const cartHref = `${basePath}/cart`
+function FooterVariant({ store }: { store: StorefrontConfig }) {
+  const homeHref = "/"
+  const cartHref = "/cart"
 
   if (store.variants.footer === "footer-02") {
     return <Footer02 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} cartHref={cartHref} />
@@ -110,14 +119,8 @@ function FooterVariant({ store, basePath }: { store: StorefrontConfig; basePath:
   return <Footer01 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} />
 }
 
-export function StorefrontPage({
-  store,
-  basePath,
-}: {
-  store: StorefrontConfig
-  basePath: string
-}) {
-  const navigation = mapNavigationForStore(basePath, store.navigation)
+export function StorefrontPage({ store }: { store: StorefrontConfig }) {
+  const navigation = mapNavigationForStore(store.navigation)
   const [searchOpen, setSearchOpen] = useState(false)
 
   return (
@@ -127,11 +130,11 @@ export function StorefrontPage({
         {store.variants.banner === "promo-03" ? <PromoBannerThree /> : null}
         {store.variants.banner === "promo-01" ? <PromoBannerOne /> : null}
 
-        <StorefrontHeader store={store} navigation={navigation} basePath={basePath} onOpenSearch={() => setSearchOpen(true)} />
+        <StorefrontHeader store={store} navigation={navigation} onOpenSearch={() => setSearchOpen(true)} />
         <HeroSectionVariant store={store} />
 
-        <StorefrontExperience config={store} basePath={basePath} searchOpen={searchOpen} onSearchOpenChange={setSearchOpen} />
-        <FooterVariant store={store} basePath={basePath} />
+        <StorefrontExperience config={store} searchOpen={searchOpen} onSearchOpenChange={setSearchOpen} />
+        <FooterVariant store={store} />
       </main>
     </StoreThemeProvider>
   )

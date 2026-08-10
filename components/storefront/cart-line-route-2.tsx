@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { Trash2 } from "lucide-react"
-import { CartQtyControl } from "@/components/commercn/carts/cart-qty-control"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
-import { formatLineMeta, formatMoney, useCartLineState } from "@/components/commercn/carts/cart-utils"
+import { CartQtyControl } from "@/components/storefront/cart-qty-control"
+import { formatLineMeta, formatMoney, useCartLineState } from "@/lib/cart"
+import type { ShoppingCartLine } from "@/lib/types"
 
 export type CartRoute2LineProps = {
   line?: ShoppingCartLine

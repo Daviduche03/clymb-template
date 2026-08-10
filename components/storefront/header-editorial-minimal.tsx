@@ -82,12 +82,6 @@ export function HeaderEditorialMinimal({
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-4 sm:gap-6">
-          <button
-            type="button"
-            className="hidden text-[0.68rem] font-medium uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-zinc-950 md:inline-flex"
-          >
-            Account
-          </button>
           <Link
             href={cartHref}
             className="inline-flex items-center gap-2 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-zinc-950"

@@ -24,12 +24,22 @@ export type NavigationSection = {
 type HeaderProps = {
   navigationData: NavigationSection[]
   logoUrl?: string
+  storeName?: string
   className?: string
   homeHref?: string
   onOpenSearch?: () => void
 }
 
-const Header = ({ navigationData, logoUrl, className, homeHref = "/", onOpenSearch }: HeaderProps) => {
+const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/", onOpenSearch }: HeaderProps) => {
+  const wordmark = storeName
+    ? storeName
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 4)
+        .toUpperCase()
+    : "CLYMB"
+
   return (
     <header className={cn('bg-background/95 sticky top-0 z-50 border-b backdrop-blur-sm', className)}>
       <div className='mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8'>
@@ -67,15 +77,12 @@ const Header = ({ navigationData, logoUrl, className, homeHref = "/", onOpenSear
             {logoUrl ? (
               <img src={logoUrl} alt="Store logo" className="h-8 w-auto" />
             ) : (
-              <div className='text-[2.1rem] font-semibold tracking-[-0.08em] text-zinc-950'>CLYMB.</div>
+              <div className='text-[2.1rem] font-semibold tracking-[-0.08em] text-zinc-950'>{wordmark}.</div>
             )}
           </Link>
         </div>
 
         <div className='hidden min-w-0 flex-1 items-center justify-end gap-5 md:flex'>
-          <button type='button' className='text-muted-foreground hover:text-foreground text-xs font-medium transition-colors'>
-            Account
-          </button>
           <Link href={`${homeHref === "/" ? "" : homeHref}/cart`} className='text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-xs font-medium transition-colors'>
             Cart
             <ShoppingBag className='size-4' />

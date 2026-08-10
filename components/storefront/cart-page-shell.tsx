@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { CartLine } from "@/components/commercn/carts/cart-line"
-import type { ShoppingCartLine } from "@/components/commercn/carts/cart-types"
+import { CartLine } from "@/components/storefront/cart-line"
+import type { ShoppingCartLine } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { CartPageShellRoute2 } from "@/components/storefront/cart-page-shell-route-2"
 import type { StorefrontConfig } from "@/lib/types"

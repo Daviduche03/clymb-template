@@ -1,18 +1,18 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { headers } from "next/headers"
-import { getOrderConfirmation } from "@/lib/api/store-client"
-import { OrderOne, type OrderProps } from "@/components/commercn/orders/order-01"
+import { getOrderConfirmation, DEFAULT_STORE_ID } from "@/lib/api/store-client"
+import { OrderOne, type OrderProps } from "@/components/storefront/order-one"
 import { Button } from "@/components/ui/button"
 
 export default async function OrderConfirmationPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ store: string; orderId: string }>
+  params: Promise<{ orderId: string }>
   searchParams: Promise<{ session?: string }>
 }) {
-  const { store: storeId, orderId } = await params
+  const { orderId } = await params
   const { session } = await searchParams
   const host = (await headers()).get("host") || "localhost:3001"
   const origin = `http://${host}`
@@ -23,7 +23,7 @@ export default async function OrderConfirmationPage({
 
   let orderResult
   try {
-    orderResult = await getOrderConfirmation(storeId, orderId, session, { origin })
+    orderResult = await getOrderConfirmation(DEFAULT_STORE_ID, orderId, session, { origin })
   } catch {
     notFound()
   }
@@ -65,7 +65,7 @@ export default async function OrderConfirmationPage({
 
         <div className="pt-8">
           <Button asChild size="lg" variant="outline">
-            <Link href={`/stores/${storeId}`}>Continue Shopping</Link>
+            <Link href="/">Continue Shopping</Link>
           </Button>
         </div>
       </div>
