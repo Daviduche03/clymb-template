@@ -54,6 +54,7 @@ const HeroSection = ({
           <img
             src={image}
             alt={title}
+            fetchPriority="high"
             className="h-full min-h-[460px] w-full object-cover object-center"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/40 to-transparent" />

@@ -29,6 +29,8 @@ export function CategoryCircle({ categories }: { categories: CategoryItem[] }) {
               <img
                 src={category.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=200&auto=format&fit=crop"}
                 alt={category.title}
+                loading="lazy"
+                decoding="async"
                 className="size-full rounded-full object-cover"
               />
             </div>

@@ -82,7 +82,7 @@ export function ProductDetailTwo({ product, onAddToCart, className }: ProductDet
                     : "border-zinc-200 opacity-70 hover:opacity-100",
                 )}
               >
-                <img src={image} alt={`${model.name} ${index + 1}`} className="h-full w-full object-cover" />
+                <img src={image} alt={`${model.name} ${index + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>

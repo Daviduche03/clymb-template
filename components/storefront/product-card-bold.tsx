@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { HeartIcon, ShoppingCartIcon } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Check, HeartIcon, ShoppingCartIcon } from "lucide-react"
 import { Checkbox as CheckboxPrimitive } from "radix-ui"
 import type { ProductItem } from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
 import { cn } from "@/lib/utils"
@@ -29,10 +30,20 @@ export function ProductCardBold({
   isLowStock,
   className,
 }: ProductCardBoldProps) {
+  const [didAdd, setDidAdd] = useState(false)
+
+  useEffect(() => {
+    if (!didAdd) return
+    const timeout = window.setTimeout(() => setDidAdd(false), 1600)
+    return () => window.clearTimeout(timeout)
+  }, [didAdd])
+
   const image = (
     <img
       src={product.image}
       alt={product.imgAlt}
+      loading="lazy"
+      decoding="async"
       className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
     />
   )
@@ -102,16 +113,23 @@ export function ProductCardBold({
           {onAddToCart ? (
             <button
               type="button"
-              disabled={isOutOfStock?.(product) || isInCart?.(product)}
+              disabled={isOutOfStock?.(product) || (isInCart?.(product) && !didAdd)}
               onClick={(e) => {
                 e.stopPropagation()
                 onAddToCart(product)
+                setDidAdd(true)
               }}
-              className="inline-flex items-center gap-2 text-[0.66rem] font-medium uppercase tracking-[0.22em] text-zinc-950 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:text-zinc-300"
+              className={cn(
+                "inline-flex items-center gap-2 text-[0.66rem] font-medium uppercase tracking-[0.22em] transition-colors",
+                didAdd
+                  ? "text-emerald-600"
+                  : "text-zinc-950 hover:text-zinc-600",
+                (isOutOfStock?.(product) || (isInCart?.(product) && !didAdd)) && "cursor-not-allowed text-zinc-300",
+              )}
             >
-              <ShoppingCartIcon className="size-3.5" />
+              {didAdd ? <Check className="size-3.5" /> : <ShoppingCartIcon className="size-3.5" />}
               <span>
-                {isOutOfStock?.(product) ? "Sold out" : isInCart?.(product) ? "Added" : "Add to cart"}
+                {isOutOfStock?.(product) ? "Sold out" : didAdd ? "Added" : isInCart?.(product) ? "Added" : "Add to cart"}
               </span>
             </button>
           ) : null}

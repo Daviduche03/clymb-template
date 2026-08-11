@@ -22,7 +22,7 @@ export function HeroFullBleed({
 }: HeroFullBleedProps) {
   return (
     <section className="relative min-h-[70dvh] overflow-hidden bg-zinc-950">
-      <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover opacity-55" />
+      <img src={image} alt={title} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover opacity-55" />
       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-zinc-950/20" />
 
       <div className="relative z-10 mx-auto flex min-h-[70dvh] max-w-7xl flex-col justify-end px-4 py-14 sm:px-6 lg:px-8">

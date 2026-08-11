@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { HeartIcon, ShoppingCartIcon } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Check, HeartIcon, ShoppingCartIcon } from "lucide-react"
 import { Checkbox as CheckboxPrimitive } from "radix-ui"
 import type { ProductItem } from "@/components/shadcn-studio/blocks/product-list-01/product-list-01"
 import { cn } from "@/lib/utils"
@@ -29,10 +30,20 @@ export function ProductCardWide({
   isLowStock,
   className,
 }: ProductCardWideProps) {
+  const [didAdd, setDidAdd] = useState(false)
+
+  useEffect(() => {
+    if (!didAdd) return
+    const timeout = window.setTimeout(() => setDidAdd(false), 1600)
+    return () => window.clearTimeout(timeout)
+  }, [didAdd])
+
   const image = (
     <img
       src={product.image}
       alt={product.imgAlt}
+      loading="lazy"
+      decoding="async"
       className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
     />
   )
@@ -107,16 +118,22 @@ export function ProductCardWide({
           {onAddToCart ? (
             <button
               type="button"
-              disabled={isOutOfStock?.(product) || isInCart?.(product)}
+              disabled={isOutOfStock?.(product) || (isInCart?.(product) && !didAdd)}
               onClick={(e) => {
                 e.stopPropagation()
                 onAddToCart(product)
+                setDidAdd(true)
               }}
-              className="mt-3 inline-flex w-full items-center justify-center gap-2 border border-zinc-200 py-2 text-[0.66rem] font-medium uppercase tracking-[0.22em] text-zinc-950 transition-colors hover:bg-zinc-950 hover:text-white disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"
+              className={cn(
+                "mt-3 inline-flex w-full items-center justify-center gap-2 border py-2 text-[0.66rem] font-medium uppercase tracking-[0.22em] transition-colors disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent",
+                didAdd
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                  : "border-zinc-200 text-zinc-950 hover:bg-zinc-950 hover:text-white",
+              )}
             >
-              <ShoppingCartIcon className="size-3.5" />
+              {didAdd ? <Check className="size-3.5" /> : <ShoppingCartIcon className="size-3.5" />}
               <span>
-                {isOutOfStock?.(product) ? "Sold out" : isInCart?.(product) ? "Added" : "Add to cart"}
+                {isOutOfStock?.(product) ? "Sold out" : didAdd ? "Added" : isInCart?.(product) ? "Added" : "Add to cart"}
               </span>
             </button>
           ) : null}

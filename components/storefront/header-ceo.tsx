@@ -19,6 +19,7 @@ type HeaderCeoProps = {
   className?: string
   homeHref?: string
   onOpenSearch?: () => void
+  cartItemCount?: number
 }
 
 export function HeaderCeo({
@@ -28,6 +29,7 @@ export function HeaderCeo({
   className,
   homeHref = "/",
   onOpenSearch,
+  cartItemCount,
 }: HeaderCeoProps) {
   const cartHref = `${homeHref === "/" ? "" : homeHref}/cart`
   const wordmark = storeName
@@ -103,7 +105,14 @@ export function HeaderCeo({
             className="inline-flex items-center gap-2 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-zinc-950"
           >
             Cart
-            <ShoppingBag className="size-4" />
+            <span className="relative">
+              <ShoppingBag className="size-4" />
+              {cartItemCount ? (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-zinc-950 px-1 text-[0.6rem] font-semibold text-white">
+                  {cartItemCount}
+                </span>
+              ) : null}
+            </span>
           </Link>
         </div>
       </div>

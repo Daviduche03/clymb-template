@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
 
-import { HeartIcon, ShoppingCartIcon } from "lucide-react"
+import { Check, HeartIcon, ShoppingCartIcon } from "lucide-react"
 import { Checkbox as CheckboxPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
@@ -50,6 +51,24 @@ const ProductList = ({
 	isOutOfStock,
 	isLowStock,
 }: ProductProps) => {
+	const [justAdded, setJustAdded] = useState<Record<string, boolean>>({})
+	const timers = useRef<Record<string, number>>({})
+
+	const flashAdded = (id: string) => {
+		setJustAdded((prev) => ({ ...prev, [id]: true }))
+		if (timers.current[id]) window.clearTimeout(timers.current[id])
+		timers.current[id] = window.setTimeout(() => {
+			setJustAdded((prev) => ({ ...prev, [id]: false }))
+		}, 1600)
+	}
+
+	useEffect(() => {
+		const pending = timers.current
+		return () => {
+			Object.values(pending).forEach((t) => window.clearTimeout(t))
+		}
+	}, [])
+
 	return (
 		<section className={cn("bg-white", compact ? "py-4 sm:py-6" : "py-14 sm:py-20 lg:py-24")}>
 			<div
@@ -75,6 +94,8 @@ const ProductList = ({
 											<img
 												src={product.image}
 												alt={product.imgAlt}
+												loading="lazy"
+												decoding="async"
 												className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
 											/>
 										</div>
@@ -89,6 +110,8 @@ const ProductList = ({
 											<img
 												src={product.image}
 												alt={product.imgAlt}
+												loading="lazy"
+												decoding="async"
 												className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
 											/>
 										</div>
@@ -132,7 +155,10 @@ const ProductList = ({
 										<button
 											type="button"
 											className={cn(
-												"pointer-events-auto inline-flex items-center gap-2 bg-white font-medium uppercase text-zinc-950 transition hover:bg-zinc-950 hover:text-white disabled:cursor-not-allowed disabled:bg-white disabled:text-zinc-400",
+												"pointer-events-auto inline-flex items-center gap-2 font-medium uppercase transition disabled:cursor-not-allowed disabled:bg-white disabled:text-zinc-400",
+												justAdded[product.slug]
+													? "bg-emerald-600 text-white hover:bg-emerald-600"
+													: "bg-white text-zinc-950 hover:bg-zinc-950 hover:text-white",
 												variant === "grid-02"
 													? "h-10 px-4 text-[0.65rem] tracking-[0.24em]"
 													: "h-9 px-3 text-[0.68rem] tracking-[0.22em] shadow-sm",
@@ -141,17 +167,20 @@ const ProductList = ({
 											aria-label={
 												isOutOfStock?.(product)
 													? "Out of stock"
-													: isInCart?.(product)
-														? "Already in cart"
-														: "Add to cart"
+													: justAdded[product.slug]
+														? "Added to cart"
+														: isInCart?.(product)
+															? "Already in cart"
+															: "Add to cart"
 											}
 											onClick={(e) => {
 												e.stopPropagation()
 												onAddToCart(product)
+												flashAdded(product.slug)
 											}}
 										>
-											<ShoppingCartIcon className="size-3.5" />
-											<span>{isOutOfStock?.(product) ? "Sold out" : isInCart?.(product) ? "Added" : "Quick add"}</span>
+											{justAdded[product.slug] ? <Check className="size-3.5" /> : <ShoppingCartIcon className="size-3.5" />}
+											<span>{isOutOfStock?.(product) ? "Sold out" : justAdded[product.slug] ? "Added" : isInCart?.(product) ? "Added" : "Quick add"}</span>
 										</button>
 									</div>
 								) : null}

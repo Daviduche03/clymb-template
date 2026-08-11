@@ -71,7 +71,7 @@ export function HeroLookbook({
           </div>
 
           <div className="relative overflow-hidden bg-[var(--store-panel)]">
-            <img src={image} alt={imageAlt} className="h-full min-h-[560px] w-full object-cover object-center" />
+            <img src={image} alt={imageAlt} fetchPriority="high" className="h-full min-h-[560px] w-full object-cover object-center" />
             <div className="absolute bottom-5 left-5 flex items-center gap-3">
               <span className="border border-zinc-200 bg-white/95 px-3 py-1 text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500">
                 No. 01 — Lead

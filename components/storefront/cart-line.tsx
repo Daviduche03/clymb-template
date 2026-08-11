@@ -24,7 +24,7 @@ function CartLineOne({ line, onQuantityChange, onRemove, className }: ShoppingCa
       )}
     >
       <div className="aspect-square overflow-hidden bg-zinc-100">
-        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+        <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
       </div>
 
       <div className="flex min-w-0 flex-col gap-4">
@@ -71,7 +71,7 @@ function CartLineTwo({ line, onQuantityChange, onRemove, className }: ShoppingCa
       )}
     >
       <div className="h-16 w-16 shrink-0 overflow-hidden bg-zinc-100">
-        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+        <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
       </div>
 
       <div className="min-w-0 flex-1">
@@ -122,7 +122,7 @@ function CartLineThree({ line, onQuantityChange, onRemove, className }: Shopping
       )}
     >
       <div className="aspect-[4/3] w-full shrink-0 bg-zinc-100 sm:aspect-auto sm:h-40 sm:w-40">
-        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+        <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
       </div>
 
       <div className="flex flex-1 flex-col justify-between gap-4 p-4">

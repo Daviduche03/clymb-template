@@ -138,7 +138,7 @@ const HeroSection = ({
             <CarouselContent>
               {menudata.map(item => (
                 <CarouselItem key={item.id} className='flex w-full items-center justify-center'>
-                  <img src={item.img} alt={item.imgAlt} className='obeh size-95 object-contain' />
+                  <img src={item.img} alt={item.imgAlt} fetchPriority="high" className='obeh size-95 object-contain' />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -171,7 +171,7 @@ const HeroSection = ({
                         />
                       </svg>
                     </div>
-                    <img src={item.img} alt={item.imgAlt} className='size-25' />
+                    <img src={item.img} alt={item.imgAlt} loading="lazy" decoding="async" className='size-25' />
                   </div>
                 </CarouselItem>
               ))}
@@ -193,6 +193,8 @@ const HeroSection = ({
                   <img
                     src={item.userAvatar}
                     alt={item.imgAlt}
+                    loading="lazy"
+                    decoding="async"
                     className='border-background size-10 rounded-full border-4 drop-shadow-lg'
                   />
                   <Separator orientation='vertical' className='bg-primary hidden !h-6 !w-0.5 !rounded-full sm:block' />

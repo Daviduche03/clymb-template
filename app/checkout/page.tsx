@@ -5,8 +5,10 @@ import { useEffect, useState } from "react"
 import { useMemo } from "react"
 import { Lock, ShieldCheck, Truck, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
 import { StorefrontHeader } from "@/components/storefront/storefront-header"
+import { ShippingEstimator, type ShippingEstimate } from "@/components/storefront/shipping-estimator"
 import { useCart } from "@/hooks/use-cart"
 import { mapNavigationForStore } from "@/lib/types"
 import type { StorefrontConfig } from "@/lib/types"
@@ -40,7 +42,7 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
   const { lines, cartTotal, isLoaded, cartStoreId, sessionToken } = useCart(store.id)
 
   const [email, setEmail] = useState("")
-  const [address, setAddress] = useState("")
+  const [shipping, setShipping] = useState<ShippingEstimate | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [idempotencyKey] = useState(() => crypto.randomUUID())
@@ -49,6 +51,9 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
   const lineCount = cartLinesArray.reduce((sum, line) => sum + line.quantity, 0)
   const activeStoreId = cartStoreId ?? store.id
   const navigation = mapNavigationForStore(store.navigation)
+  const shippingCost = shipping?.cost ?? 0
+  const shippingKnown = shipping != null
+  const orderTotal = cartTotal + shippingCost
 
   if (!isLoaded) return <CheckoutLoading />
 
@@ -97,7 +102,9 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
       const result = await checkout(activeStoreId, {
         sessionToken: token,
         customerEmail: email,
-        shippingAddress: address,
+        shippingAddress: shipping
+          ? `${shipping.city}, ${shipping.region}, ${shipping.country}`
+          : undefined,
         idempotencyKey,
       })
 
@@ -166,24 +173,14 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
                       className={inputClass}
                     />
                   </div>
-                  <div>
-                    <label
-                      htmlFor="address"
-                      className="mb-2 block text-[0.7rem] font-medium uppercase tracking-[0.2em] text-zinc-500"
-                    >
-                      Shipping address
-                    </label>
-                    <input
-                      id="address"
-                      type="text"
-                      required
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="123 Main St, New York, NY"
-                      className={inputClass}
-                    />
-                  </div>
                 </div>
+
+                <ShippingEstimator
+                  subtotal={cartTotal}
+                  freeShippingThreshold={50}
+                  onEstimate={setShipping}
+                  className="mt-5"
+                />
               </section>
 
               <section>
@@ -216,7 +213,7 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
                   >
                     {isSubmitting
                       ? "Processing…"
-                      : `Pay ${formatMoney(cartTotal)}`}
+                      : `Pay ${formatMoney(orderTotal)}`}
                   </Button>
                   <p className="mt-3 text-center text-xs text-zinc-400">
                     Your order details and {cartTotal > 0 ? `$${cartTotal.toFixed(2)}` : "total"} are
@@ -285,12 +282,26 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
                   </div>
                   <div className="flex items-center justify-between text-zinc-500">
                     <span>Shipping</span>
-                    <span className="text-zinc-900">Free</span>
+                    {shippingKnown ? (
+                      <span className={cn(shippingCost === 0 ? "text-emerald-600" : "text-zinc-900")}>
+                        {shippingCost === 0 ? "Free" : formatMoney(shippingCost)}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document.getElementById("shipping-country")?.scrollIntoView({ behavior: "smooth", block: "center" })
+                        }
+                        className="text-xs text-zinc-400 underline underline-offset-2 hover:text-zinc-900"
+                      >
+                        Calculate
+                      </button>
+                    )}
                   </div>
                   <div className="my-2 border-t border-zinc-200" />
                   <div className="flex items-center justify-between text-base font-semibold text-zinc-950">
                     <span>Total</span>
-                    <span>{formatMoney(cartTotal)}</span>
+                    <span>{formatMoney(orderTotal)}</span>
                   </div>
                 </div>
               </div>

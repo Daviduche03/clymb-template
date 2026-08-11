@@ -200,7 +200,7 @@ export function ProductDetailThree({ product, onAddToCart, className }: ProductD
                   active === index ? "border-zinc-900 ring-2 ring-zinc-900/10" : "border-zinc-200 opacity-70 hover:opacity-100",
                 )}
               >
-                <img src={image} alt={`${model.name} ${index + 1}`} className="h-full w-full object-cover" />
+                <img src={image} alt={`${model.name} ${index + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>

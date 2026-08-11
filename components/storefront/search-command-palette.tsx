@@ -159,6 +159,8 @@ export function SearchCommandPalette({
                       <img
                         src={product.image}
                         alt={product.imgAlt || product.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover"
                       />
                     </div>

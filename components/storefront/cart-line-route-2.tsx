@@ -19,7 +19,7 @@ export function CartRoute2Line({ line, onQuantityChange, onRemove }: CartRoute2L
   return (
     <li className="grid grid-cols-[72px_minmax(0,1fr)_auto] items-start gap-4 py-5 sm:grid-cols-[96px_minmax(0,1fr)_auto]">
       <div className="aspect-square overflow-hidden rounded-lg border border-zinc-100 bg-zinc-100">
-        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+        <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
       </div>
 
       <div className="flex min-w-0 flex-col gap-1">

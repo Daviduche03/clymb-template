@@ -61,10 +61,8 @@ export function StorefrontExperience({
 
   const allowDetailDialog = config.variants.productDetails === "dialog" || config.variants.productDetails === "both"
   const allowDetailRoute = config.variants.productDetails === "route" || config.variants.productDetails === "both"
-  const allowCartRoute = config.variants.cart === "route" || config.variants.cart === "route-2" || config.variants.cart === "both"
 
   const productHref = useCallback((slug: string) => `/products/${slug}`, [])
-  const cartHref = "/cart"
 
   const getInventory = useCallback((product: StoreProduct, variantTitle?: string) => {
     if (product.variants && product.variants.length > 0) {
@@ -91,9 +89,8 @@ export function StorefrontExperience({
     (product: StoreProduct, quantity: number, variantTitle?: string) => {
       if (isOutOfStock(product, variantTitle)) return
       void addToCartBase(toCartLine(product, quantity, variantTitle)).catch(() => {})
-      if (allowCartRoute) window.location.href = cartHref
     },
-    [addToCartBase, allowCartRoute, isOutOfStock, cartHref],
+    [addToCartBase, isOutOfStock],
   )
 
   const scrollToCollection = useCallback(() => {

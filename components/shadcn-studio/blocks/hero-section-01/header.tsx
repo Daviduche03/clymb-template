@@ -28,9 +28,10 @@ type HeaderProps = {
   className?: string
   homeHref?: string
   onOpenSearch?: () => void
+  cartItemCount?: number
 }
 
-const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/", onOpenSearch }: HeaderProps) => {
+const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/", onOpenSearch, cartItemCount = 0 }: HeaderProps) => {
   const wordmark = storeName
     ? storeName
         .split(" ")
@@ -85,7 +86,14 @@ const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/",
         <div className='hidden min-w-0 flex-1 items-center justify-end gap-5 md:flex'>
           <Link href={`${homeHref === "/" ? "" : homeHref}/cart`} className='text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-xs font-medium transition-colors'>
             Cart
-            <ShoppingBag className='size-4' />
+            <span className="relative">
+              <ShoppingBag className='size-4' />
+              {cartItemCount ? (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-zinc-950 px-1 text-[0.6rem] font-semibold text-white">
+                  {cartItemCount}
+                </span>
+              ) : null}
+            </span>
           </Link>
         </div>
       </div>

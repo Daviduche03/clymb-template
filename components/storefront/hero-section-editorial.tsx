@@ -56,7 +56,7 @@ export function HeroSectionEditorial({
 
         <div className="grid gap-4 lg:grid-cols-[1fr_160px]">
           <div className="relative overflow-hidden bg-[var(--store-panel)]">
-            <img src={image} alt={title} className="h-full min-h-[520px] w-full object-cover object-center" />
+            <img src={image} alt={title} fetchPriority="high" className="h-full min-h-[520px] w-full object-cover object-center" />
             <div className="absolute left-4 top-4 bg-white/95 px-3 py-1 text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500">
               Editorial drop
             </div>

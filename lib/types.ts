@@ -145,7 +145,9 @@ export function productToDetailModel(product: StoreProduct): ProductDetailModel 
 }
 
 export function toCartLine(product: StoreProduct, quantity: number, variantTitle?: string): ShoppingCartLine {
-  const defaultVariant = (product.detail?.sizes ?? [])[0] ?? "default"
+  const defaultVariantTitle = (product.detail?.sizes ?? [])[0] ?? "Default"
+  const selectedTitle = variantTitle || defaultVariantTitle
+  const matchingVariant = product.variants?.find((v) => v.title.toLowerCase() === selectedTitle.toLowerCase())
   return {
     id: product.slug,
     productId: product.id,
@@ -156,7 +158,7 @@ export function toCartLine(product: StoreProduct, quantity: number, variantTitle
     image: product.image,
     price: product.salePrice ?? product.price,
     quantity,
-    variantId: variantTitle || defaultVariant,
+    variantId: matchingVariant?.id ?? (matchingVariant?.title ?? selectedTitle),
     variantTitle,
     currency: product.detail?.currency ?? "$",
   }

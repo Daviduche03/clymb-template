@@ -82,6 +82,8 @@ export function ProductDetailOne({ product, onAddToCart, className, variant = "e
                 <img
                   src={image}
                   alt={`${model.name} ${index + 1}`}
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover"
                 />
               </button>

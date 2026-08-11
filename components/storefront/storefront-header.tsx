@@ -1,8 +1,11 @@
+"use client"
+
 import Header from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import type { NavigationSection } from "@/components/shadcn-studio/blocks/hero-section-01/header"
 import { HeaderCeo } from "@/components/storefront/header-ceo"
 import { HeaderEditorialMinimal } from "@/components/storefront/header-editorial-minimal"
 import { HeaderPerformance } from "@/components/storefront/header-performance"
+import { useCart } from "@/hooks/use-cart"
 import type { StorefrontConfig } from "@/lib/types"
 
 type StorefrontHeaderProps = {
@@ -19,6 +22,8 @@ export function StorefrontHeader({
   onOpenSearch,
 }: StorefrontHeaderProps) {
   const homeHref = "/"
+  const { lines } = useCart(store.id)
+  const cartItemCount = Object.values(lines).reduce((sum, line) => sum + line.quantity, 0)
 
   if (store.variants.header === "header-04") {
     return (
@@ -29,6 +34,7 @@ export function StorefrontHeader({
         homeHref={homeHref}
         className={className}
         onOpenSearch={onOpenSearch}
+        cartItemCount={cartItemCount}
       />
     )
   }
@@ -42,6 +48,7 @@ export function StorefrontHeader({
         homeHref={homeHref}
         className={className}
         onOpenSearch={onOpenSearch}
+        cartItemCount={cartItemCount}
       />
     )
   }
@@ -55,6 +62,7 @@ export function StorefrontHeader({
         homeHref={homeHref}
         className={className}
         onOpenSearch={onOpenSearch}
+        cartItemCount={cartItemCount}
       />
     )
   }
@@ -67,6 +75,7 @@ export function StorefrontHeader({
       homeHref={homeHref}
       className={className}
       onOpenSearch={onOpenSearch}
+      cartItemCount={cartItemCount}
     />
   )
 }

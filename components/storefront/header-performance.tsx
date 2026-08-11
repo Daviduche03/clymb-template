@@ -17,6 +17,7 @@ type HeaderPerformanceProps = {
   className?: string
   homeHref?: string
   onOpenSearch?: () => void
+  cartItemCount?: number
 }
 
 export function HeaderPerformance({
@@ -26,6 +27,7 @@ export function HeaderPerformance({
   className,
   homeHref = "/",
   onOpenSearch,
+  cartItemCount,
 }: HeaderPerformanceProps) {
   const cartHref = `${homeHref === "/" ? "" : homeHref}/cart`
   const wordmark = storeName ? storeName.replace(/\s+/g, " ").trim().toUpperCase() : "APEX."
@@ -75,7 +77,14 @@ export function HeaderPerformance({
         <div className="hidden flex-1 items-center justify-end gap-5 md:flex">
           <Link href={cartHref} className="inline-flex items-center gap-2 text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-950">
             Cart
-            <ShoppingBag className="size-4" />
+            <span className="relative">
+              <ShoppingBag className="size-4" />
+              {cartItemCount ? (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-zinc-950 px-1 text-[0.6rem] font-semibold text-white">
+                  {cartItemCount}
+                </span>
+              ) : null}
+            </span>
           </Link>
         </div>
       </div>
