@@ -57,7 +57,7 @@ const ALL_COUNTRIES = REGION_RATES.flatMap((region) => region.countries)
 
 export function ShippingEstimator({
   subtotal,
-  currency = "$",
+  currency = "USD",
   freeShippingThreshold = 50,
   onEstimate,
   className,

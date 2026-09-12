@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Check, Minus, Plus, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatMoney } from "@/lib/cart"
 import type { ProductDetailModel } from "@/lib/types"
 
 const legacyModel: ProductDetailModel = {
@@ -11,7 +12,7 @@ const legacyModel: ProductDetailModel = {
   description:
     "A comfortable and durable cotton t-shirt for men. Gives you a perfect fit and a great look for every occasion.",
   category: "Clothing",
-  currency: "$",
+  currency: "USD",
   currentPrice: 19.4,
   compareAtPrice: 25.4,
   stockMessage: "Last 1 left - make it yours!",
@@ -83,13 +84,11 @@ export function ProductDetailThree({ product, onAddToCart, className }: ProductD
 
             <div className="flex flex-wrap items-end gap-3">
               <p className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
-                {model.currency}
-                {model.currentPrice.toFixed(2)}
+                {formatMoney(model.currentPrice, model.currency)}
               </p>
               {model.compareAtPrice != null ? (
                 <p className="text-xl font-medium text-zinc-400 line-through">
-                  {model.currency}
-                  {model.compareAtPrice.toFixed(2)}
+                  {formatMoney(model.compareAtPrice, model.currency)}
                 </p>
               ) : null}
             </div>

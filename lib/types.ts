@@ -130,7 +130,7 @@ export function productToDetailModel(product: StoreProduct): ProductDetailModel 
       `Includes ${product.badges.join(" · ")}. Built for all-day comfort, fitness tracking, and seamless notifications.`,
     images: product.detail?.images ?? [product.image, product.image, product.image, product.image],
     sizes: product.detail?.sizes ?? product.variants?.map((variant) => variant.title) ?? ["40mm", "44mm", "Ultra"],
-    currency: product.detail?.currency ?? "$",
+    currency: product.detail?.currency ?? "USD",
     currentPrice: product.detail?.currentPrice ?? unit,
     compareAtPrice:
       product.detail?.compareAtPrice ?? (product.salePrice != null ? product.price : undefined),
@@ -160,7 +160,7 @@ export function toCartLine(product: StoreProduct, quantity: number, variantTitle
     quantity,
     variantId: matchingVariant?.id ?? (matchingVariant?.title ?? selectedTitle),
     variantTitle,
-    currency: product.detail?.currency ?? "$",
+    currency: product.detail?.currency ?? "USD",
   }
 }
 

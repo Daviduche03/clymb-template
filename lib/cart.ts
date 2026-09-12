@@ -49,6 +49,30 @@ export function formatLineMeta(item: ShoppingCartLine) {
   return null
 }
 
-export function formatMoney(amount: number, currency = "$") {
-  return `${currency}${amount.toFixed(2)}`
+const LOCALE_FOR_CURRENCY: Record<string, string> = {
+  NGN: "en-NG",
+  USD: "en-US",
+  GBP: "en-GB",
+  EUR: "de-DE",
+  GHS: "en-GH",
+  KES: "en-KE",
+  ZAR: "en-ZA",
+  CAD: "en-CA",
+  AUD: "en-AU",
+  INR: "en-IN",
+}
+
+export function formatMoney(amount: number, currency = "USD") {
+  const upper = (currency || "USD").trim().toUpperCase()
+  const locale = LOCALE_FOR_CURRENCY[upper] ?? "en-US"
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: upper,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)
+  } catch {
+    return `${upper} ${amount.toFixed(2)}`
+  }
 }
