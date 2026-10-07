@@ -312,7 +312,7 @@ export function StorefrontExperience({
       ) : null}
 
       {sections.map((section, index) => (
-        <div key={`${section.type}-${index}`}>{renderSection(section)}</div>
+        <div key={`${section.type}-${index}`} data-editor-id={`section-${section.type}`}>{renderSection(section)}</div>
       ))}
 
       <SearchCommandPalette
@@ -417,7 +417,7 @@ function CategoriesSection({
           <div className="flex flex-col gap-1">
             <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-zinc-500">Collections</p>
             <h2 className="text-4xl font-semibold tracking-[-0.04em] text-zinc-950">{title}</h2>
-            <p className="max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">{description}</p>
+            <p data-editor-desc="section" className="max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">{description}</p>
           </div>
           <Button className="group rounded-none px-0 text-xs uppercase tracking-[0.22em] text-zinc-950 hover:bg-transparent" variant="ghost" asChild>
             <a href="#collection" onClick={(event) => { event.preventDefault(); scrollToCollection() }}>
@@ -486,7 +486,7 @@ function FeaturedProductsSection({
       <div className="mx-auto max-w-7xl">
         <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-zinc-500">Featured edit</p>
         <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-zinc-950">{title}</h3>
-        <p className="mb-8 mt-2 max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">{description}</p>
+        <p data-editor-desc="section" className="mb-8 mt-2 max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">{description}</p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product, index) =>
             index % 2 === 0 ? (
@@ -544,7 +544,7 @@ function MerchandisingSection(props: {
           <div>
             <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-zinc-500">Merchandising</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-zinc-950">{props.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-zinc-600">{props.description}</p>
+            <p data-editor-desc="section" className="mt-2 text-sm leading-6 text-zinc-600">{props.description}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {(["new", "best", "sale"] as MerchTab[]).map((tab) => (

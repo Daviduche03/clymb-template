@@ -109,14 +109,15 @@ function HeroSectionVariant({ store }: { store: StorefrontConfig }) {
 function FooterVariant({ store }: { store: StorefrontConfig }) {
   const homeHref = "/"
   const cartHref = "/cart"
+  const footerProps = { storeName: store.name, logoUrl: store.theme?.logoUrl, footer: store.footer }
 
   if (store.variants.footer === "footer-02") {
-    return <Footer02 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} cartHref={cartHref} />
+    return <Footer02 {...footerProps} homeHref={homeHref} cartHref={cartHref} />
   }
   if (store.variants.footer === "footer-03") {
-    return <Footer03 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} cartHref={cartHref} />
+    return <Footer03 {...footerProps} homeHref={homeHref} cartHref={cartHref} />
   }
-  return <Footer01 storeName={store.name} logoUrl={store.theme?.logoUrl} homeHref={homeHref} />
+  return <Footer01 {...footerProps} homeHref={homeHref} />
 }
 
 export function StorefrontPage({ store }: { store: StorefrontConfig }) {
@@ -127,14 +128,22 @@ export function StorefrontPage({ store }: { store: StorefrontConfig }) {
     <StoreThemeProvider config={store}>
       <StoreAnalyticsTracker storeId={store.id} />
       <main className="min-h-screen bg-white">
-        {store.variants.banner === "promo-03" ? <PromoBannerThree /> : null}
-        {store.variants.banner === "promo-01" ? <PromoBannerOne /> : null}
+        <div data-editor-id="banner">
+          {store.variants.banner === "promo-03" ? <PromoBannerThree banner={store.banner} /> : null}
+          {store.variants.banner === "promo-01" ? <PromoBannerOne banner={store.banner} /> : null}
+        </div>
 
-        <StorefrontHeader store={store} navigation={navigation} onOpenSearch={() => setSearchOpen(true)} />
-        <HeroSectionVariant store={store} />
+        <div data-editor-id="header">
+          <StorefrontHeader store={store} navigation={navigation} onOpenSearch={() => setSearchOpen(true)} />
+        </div>
+        <div data-editor-id="hero">
+          <HeroSectionVariant store={store} />
+        </div>
 
         <StorefrontExperience config={store} searchOpen={searchOpen} onSearchOpenChange={setSearchOpen} />
-        <FooterVariant store={store} />
+        <div data-editor-id="footer">
+          <FooterVariant store={store} />
+        </div>
       </main>
     </StoreThemeProvider>
   )

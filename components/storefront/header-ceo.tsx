@@ -41,7 +41,7 @@ export function HeaderCeo({
     <header className={cn("sticky top-0 z-50 border-b border-zinc-200 bg-white", className)}>
       <div className="border-b border-zinc-200 bg-zinc-950">
         <div className="mx-auto flex h-9 max-w-[90rem] items-center justify-between px-4 text-[0.65rem] uppercase tracking-[0.24em] text-zinc-300 sm:px-6 lg:px-10">
-          <span>{tagline}</span>
+          <span data-edit-field="header.storeName">{tagline}</span>
           <span className="hidden sm:inline">Free shipping over $50</span>
         </div>
       </div>
@@ -57,9 +57,11 @@ export function HeaderCeo({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="start">
-                {navigationData.map((item) => (
+                {navigationData.map((item, index) => (
                   <DropdownMenuItem key={item.title}>
-                    <Link href={item.href}>{item.title}</Link>
+                    <Link href={item.href} data-edit-field={`nav.${index}.title`}>
+                      {item.title}
+                    </Link>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -67,10 +69,11 @@ export function HeaderCeo({
           </div>
 
           <nav className="hidden items-center gap-8 lg:flex">
-            {navigationData.slice(0, 3).map((item) => (
+            {navigationData.slice(0, 3).map((item, index) => (
               <Link
                 key={item.title}
                 href={item.href}
+                data-edit-field={`nav.${index}.title`}
                 className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-zinc-950"
               >
                 {item.title}
@@ -82,10 +85,13 @@ export function HeaderCeo({
         <div className="flex justify-center">
           <Link href={homeHref} className="inline-flex items-center justify-center">
             {logoUrl ? (
-              <img src={logoUrl} alt="Store logo" className="h-8 w-auto" />
+              <img src={logoUrl} alt="Store logo" data-edit-field="header.logo" data-edit-kind="image" className="h-8 w-auto" />
             ) : (
               <div className="text-[2rem] font-semibold tracking-[-0.1em] text-zinc-950">
-                {wordmark}<span className="text-zinc-400">.</span>
+                <span data-edit-field="header.storeName" data-edit-derive="initials">
+                  {wordmark}
+                </span>
+                <span className="text-zinc-400">.</span>
               </div>
             )}
           </Link>

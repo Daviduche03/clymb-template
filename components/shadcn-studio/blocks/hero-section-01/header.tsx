@@ -66,7 +66,9 @@ const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/",
             <DropdownMenuContent className='w-56' align='start'>
               {navigationData.map((item, index) => (
                 <DropdownMenuItem key={index}>
-                  <Link href={item.href}>{item.title}</Link>
+                  <Link href={item.href} data-edit-field={`nav.${index}.title`}>
+                    {item.title}
+                  </Link>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -76,9 +78,14 @@ const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/",
         <div className='flex justify-center md:flex-none'>
           <Link href={homeHref} className='inline-flex items-center justify-center'>
             {logoUrl ? (
-              <img src={logoUrl} alt="Store logo" className="h-8 w-auto" />
+              <img src={logoUrl} alt="Store logo" data-edit-field="header.logo" data-edit-kind="image" className="h-8 w-auto" />
             ) : (
-              <div className='text-[2.1rem] font-semibold tracking-[-0.08em] text-zinc-950'>{wordmark}.</div>
+              <div className='text-[2.1rem] font-semibold tracking-[-0.08em] text-zinc-950'>
+                <span data-edit-field="header.storeName" data-edit-derive="initials">
+                  {wordmark}
+                </span>
+                .
+              </div>
             )}
           </Link>
         </div>
@@ -101,10 +108,11 @@ const Header = ({ navigationData, logoUrl, storeName, className, homeHref = "/",
       <div className='hidden border-t md:block'>
         <NavigationMenu className='mx-auto h-12 max-w-7xl px-4 sm:px-6 lg:px-8'>
           <NavigationMenuList className='flex h-full flex-wrap justify-center gap-1'>
-            {navigationData.map(navItem => (
+            {navigationData.map((navItem, index) => (
               <NavigationMenuItem key={navItem.title}>
                 <NavigationMenuLink
                   href={navItem.href}
+                  data-edit-field={`nav.${index}.title`}
                   className='text-muted-foreground hover:text-foreground relative px-4 py-3 text-sm font-medium hover:bg-transparent data-[active]:text-foreground'
                 >
                   {navItem.title}

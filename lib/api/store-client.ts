@@ -7,7 +7,10 @@ import type { NavigationSection } from "@/components/shadcn-studio/blocks/hero-s
 
 const API_BASE = "/api/store"
 
-export const DEFAULT_STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "default"
+export const DEFAULT_STORE_ID =
+  (typeof globalThis !== "undefined" && (globalThis as { __STORE_ID__?: string }).__STORE_ID__) ||
+  process.env.NEXT_PUBLIC_STORE_ID ||
+  "default"
 
 const defaultVariants: StorefrontVariants = {
   banner: "none",

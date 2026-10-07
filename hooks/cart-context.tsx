@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import type { ReactNode } from "react"
 import type { ShoppingCartLine } from "@/lib/types"
-import { getCart, addToCart as apiAddToCart, updateCartItem, deleteCartItem, getStore, StoreApiError } from "@/lib/api/store-client"
+import { DEFAULT_STORE_ID, getCart, addToCart as apiAddToCart, updateCartItem, deleteCartItem, getStore, StoreApiError } from "@/lib/api/store-client"
 
 const CART_SESSION_KEY_PREFIX = "storefront_cart_session_v1"
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -102,7 +102,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void (async () => {
-      const storeId = targetStoreId ?? "default"
+      const storeId = targetStoreId ?? DEFAULT_STORE_ID
       setIsLoaded(false)
       const resolvedStoreId = await resolveCartStoreId(storeId)
       const token = migrateSessionToken(storeId, resolvedStoreId)
@@ -118,7 +118,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })()
   }, [targetStoreId, hydrateCart])
 
-  const activeStoreId = cartStoreId ?? targetStoreId ?? "default"
+  const activeStoreId = cartStoreId ?? targetStoreId ?? DEFAULT_STORE_ID
 
   const cartCount = useMemo(
     () => Object.values(lines).reduce((sum, l) => sum + l.quantity, 0),
@@ -131,8 +131,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   )
 
   const addToCart = useCallback(async (line: ShoppingCartLine) => {
-    const resolvedStoreId = cartStoreId ?? (await resolveCartStoreId(targetStoreId ?? "default"))
-    const token = sessionToken ?? migrateSessionToken(targetStoreId ?? "default", resolvedStoreId)
+    const resolvedStoreId = cartStoreId ?? (await resolveCartStoreId(targetStoreId ?? DEFAULT_STORE_ID))
+    const token = sessionToken ?? migrateSessionToken(targetStoreId ?? DEFAULT_STORE_ID, resolvedStoreId)
     try {
       setCartError(null)
       await apiAddToCart(resolvedStoreId, {
@@ -154,7 +154,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const setLineQty = useCallback(async (id: string, quantity: number) => {
     const token = sessionToken
-    const storeId = cartStoreId ?? targetStoreId ?? "default"
+    const storeId = cartStoreId ?? targetStoreId ?? DEFAULT_STORE_ID
     if (!token) return
     const existing = lines[id]
     const itemId = existing?.cartItemId

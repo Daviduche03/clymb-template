@@ -83,6 +83,30 @@ export type StoreTheme = {
   accentColor?: string
 }
 
+export type StoreBanner = {
+  message?: string
+  headline?: string
+  note?: string
+  linkText?: string
+  link?: string
+}
+
+export type StoreFooterLink = {
+  label: string
+  href: string
+}
+
+export type StoreFooterColumn = {
+  title?: string
+  note?: string
+  links?: StoreFooterLink[]
+}
+
+export type StoreFooter = {
+  tagline?: string
+  columns?: StoreFooterColumn[]
+}
+
 export type StorefrontConfig = {
   id: string
   name: string
@@ -96,6 +120,8 @@ export type StorefrontConfig = {
   variants: StorefrontVariants
   sections?: StorefrontSection[]
   theme?: StoreTheme
+  banner?: StoreBanner
+  footer?: StoreFooter
 }
 
 export function getDefaultStorefrontSections(config: StorefrontConfig): StorefrontSection[] {

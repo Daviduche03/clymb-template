@@ -54,9 +54,11 @@ export function HeaderEditorialMinimal({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="start">
-                {navigationData.map((item) => (
+                {navigationData.map((item, index) => (
                   <DropdownMenuItem key={item.title}>
-                    <Link href={item.href}>{item.title}</Link>
+                    <Link href={item.href} data-edit-field={`nav.${index}.title`}>
+                      {item.title}
+                    </Link>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -76,9 +78,13 @@ export function HeaderEditorialMinimal({
         <div className="flex min-w-0 flex-1 justify-center">
           <Link href={homeHref} className="inline-flex items-center justify-center">
             {logoUrl ? (
-              <img src={logoUrl} alt="Store logo" className="h-8 w-auto" />
+              <img src={logoUrl} alt="Store logo" data-edit-field="header.logo" data-edit-kind="image" className="h-8 w-auto" />
             ) : (
-              <div className="text-[1.65rem] font-semibold tracking-[-0.1em] text-zinc-950">{wordmark}</div>
+              <div className="text-[1.65rem] font-semibold tracking-[-0.1em] text-zinc-950">
+                <span data-edit-field="header.storeName" data-edit-derive="initials">
+                  {wordmark}
+                </span>
+              </div>
             )}
           </Link>
         </div>
@@ -103,10 +109,11 @@ export function HeaderEditorialMinimal({
 
       <div className="hidden border-t border-zinc-200 md:block">
         <nav className="mx-auto flex h-12 max-w-[90rem] items-center justify-center gap-8 px-4 sm:px-6 lg:px-10">
-          {navigationData.map((item) => (
+          {navigationData.map((item, index) => (
             <Link
               key={item.title}
               href={item.href}
+              data-edit-field={`nav.${index}.title`}
               className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-zinc-500 transition-colors hover:text-zinc-950"
             >
               {item.title}

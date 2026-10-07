@@ -57,7 +57,9 @@ export function HeaderPerformance({
             <DropdownMenuContent className="w-56" align="start">
               {navigationData.map((item, index) => (
                 <DropdownMenuItem key={index}>
-                  <Link href={item.href}>{item.title}</Link>
+                  <Link href={item.href} data-edit-field={`nav.${index}.title`}>
+                    {item.title}
+                  </Link>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -67,9 +69,13 @@ export function HeaderPerformance({
         <div className="flex justify-center">
           <Link href={homeHref} className="inline-flex items-center justify-center">
             {logoUrl ? (
-              <img src={logoUrl} alt="Store logo" className="h-8 w-auto" />
+              <img src={logoUrl} alt="Store logo" data-edit-field="header.logo" data-edit-kind="image" className="h-8 w-auto" />
             ) : (
-              <div className="text-[1.8rem] font-semibold tracking-[-0.08em] text-zinc-950">{wordmark}</div>
+              <div className="text-[1.8rem] font-semibold tracking-[-0.08em] text-zinc-950">
+                <span data-edit-field="header.storeName" data-edit-derive="upper">
+                  {wordmark}
+                </span>
+              </div>
             )}
           </Link>
         </div>
@@ -91,10 +97,11 @@ export function HeaderPerformance({
 
       <div className="hidden border-t md:block">
         <div className="mx-auto flex h-12 max-w-7xl items-center justify-center gap-8 px-4 sm:px-6 lg:px-8">
-          {navigationData.map((item) => (
+          {navigationData.map((item, index) => (
             <Link
               key={item.title}
               href={item.href}
+              data-edit-field={`nav.${index}.title`}
               className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
             >
               {item.title}
