@@ -14,7 +14,7 @@ const defaultBanner = {
 
 const defaultPromoThree = {
   headline: "Flash Sale Ends Today",
-  note: "Free shipping on all orders over $50",
+  note: "Limited time — while stock lasts",
 }
 
 type BannerProps = {

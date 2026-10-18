@@ -165,7 +165,7 @@ export function productToDetailModel(product: StoreProduct): ProductDetailModel 
         ? "Out of stock"
         : totalAvailable <= 3
           ? `Only ${totalAvailable} left`
-          : (product.detail?.stockMessage ?? "Free returns within 30 days."),
+          : (product.detail?.stockMessage ?? "In stock"),
     sizeAvailability,
   }
 }

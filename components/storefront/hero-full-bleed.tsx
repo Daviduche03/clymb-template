@@ -6,19 +6,20 @@ type HeroFullBleedProps = {
   title?: string
   description?: string
   image?: string
+  /**
+   * Real, verifiable trust stats (average rating, orders fulfilled). Optional
+   * on purpose: a store with no real numbers must not show invented ones, so
+   * the row simply does not render until real data is supplied.
+   */
+  stats?: { value: string; label: string }[]
 }
-
-const stats = [
-  { value: "4.9/5", label: "Avg. rating" },
-  { value: "50k+", label: "Orders fulfilled" },
-  { value: "30d", label: "Free returns" },
-]
 
 export function HeroFullBleed({
   badge = "New season",
   title = "Train harder. Look sharper.",
   description = "High-performance essentials for every gym day — engineered for durability, designed for the long run.",
   image = "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1400&auto=format&fit=crop",
+  stats,
 }: HeroFullBleedProps) {
   return (
     <section className="relative min-h-[70dvh] overflow-hidden bg-zinc-950">
@@ -46,17 +47,19 @@ export function HeroFullBleed({
           </Button>
         </div>
 
-        <div className="mt-14 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/20 pt-6">
-          {stats.map((stat) => (
-            <div key={stat.label}>
-              <p className="text-2xl font-semibold tracking-[-0.03em] text-white">{stat.value}</p>
-              <p className="mt-1 text-[0.68rem] uppercase tracking-[0.2em] text-zinc-400">
-                {stat.label}
-                <ArrowRight className="ml-1 inline size-3 text-zinc-500" />
-              </p>
-            </div>
-          ))}
-        </div>
+        {stats && stats.length > 0 ? (
+          <div className="mt-14 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/20 pt-6">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <p className="text-2xl font-semibold tracking-[-0.03em] text-white">{stat.value}</p>
+                <p className="mt-1 text-[0.68rem] uppercase tracking-[0.2em] text-zinc-400">
+                  {stat.label}
+                  <ArrowRight className="ml-1 inline size-3 text-zinc-500" />
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   )

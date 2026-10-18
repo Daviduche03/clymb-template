@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Check, Minus, Plus, ShieldCheck } from "lucide-react"
+import { Check, Minus, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatMoney } from "@/lib/cart"
 import type { ProductDetailModel } from "@/lib/types"
@@ -170,10 +170,6 @@ export function ProductDetailThree({ product, onAddToCart, className }: ProductD
                       )}
                 </Button>
               </div>
-              <p className="flex items-center gap-2 text-xs text-zinc-500">
-                <ShieldCheck className="h-4 w-4" />
-                30-day money-back guarantee
-              </p>
             </div>
           </div>
         </div>

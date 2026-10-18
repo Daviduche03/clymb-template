@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useMemo } from "react"
-import { Lock, ShieldCheck, Truck, RotateCcw } from "lucide-react"
+import { Lock, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { StoreThemeProvider } from "@/components/storefront/store-theme-provider"
@@ -177,7 +177,6 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
 
                 <ShippingEstimator
                   subtotal={cartTotal}
-                  freeShippingThreshold={50}
                   onEstimate={setShipping}
                   className="mt-5"
                 />
@@ -222,15 +221,7 @@ function CheckoutPageContent({ store }: { store: StorefrontConfig }) {
                 </div>
               </section>
 
-              <div className="grid grid-cols-1 gap-4 border-t border-zinc-200 pt-6 sm:grid-cols-3">
-                <div className="flex items-center gap-3">
-                  <Truck className="h-4 w-4 text-zinc-400" />
-                  <p className="text-xs text-zinc-500">Free shipping over $50</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <RotateCcw className="h-4 w-4 text-zinc-400" />
-                  <p className="text-xs text-zinc-500">30-day returns</p>
-                </div>
+              <div className="grid grid-cols-1 gap-4 border-t border-zinc-200 pt-6 sm:grid-cols-1">
                 <div className="flex items-center gap-3">
                   <ShieldCheck className="h-4 w-4 text-zinc-400" />
                   <p className="text-xs text-zinc-500">Secure payment via Polar</p>
