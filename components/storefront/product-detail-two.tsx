@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Check, ChevronRight, Minus, Plus, Truck } from "lucide-react"
+import { Check, Minus, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatMoney } from "@/lib/cart"
 import type { ProductDetailModel } from "@/lib/types"
@@ -179,12 +179,6 @@ export function ProductDetailTwo({ product, onAddToCart, className }: ProductDet
                       "Add to cart"
                     )}
               </Button>
-            </div>
-
-            <div className="flex items-center gap-2 border-t border-zinc-200 pt-5 text-sm text-zinc-500">
-              <Truck className="h-4 w-4" />
-              Free shipping on orders over $50
-              <ChevronRight className="ml-auto h-4 w-4" />
             </div>
           </div>
         </div>

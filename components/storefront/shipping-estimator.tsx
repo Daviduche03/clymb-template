@@ -18,6 +18,7 @@ export type ShippingEstimate = {
 export type ShippingEstimatorProps = {
   subtotal: number
   currency?: string
+  /** When omitted, the store has no free-shipping threshold and none is promised. */
   freeShippingThreshold?: number
   onEstimate?: (estimate: ShippingEstimate | null) => void
   className?: string
@@ -58,7 +59,7 @@ const ALL_COUNTRIES = REGION_RATES.flatMap((region) => region.countries)
 export function ShippingEstimator({
   subtotal,
   currency = "USD",
-  freeShippingThreshold = 50,
+  freeShippingThreshold,
   onEstimate,
   className,
 }: ShippingEstimatorProps) {
@@ -80,7 +81,7 @@ export function ShippingEstimator({
     setIsCalculating(true)
     // Simulate a short network delay for a realistic async feel.
     window.setTimeout(() => {
-      const free = subtotal >= freeShippingThreshold
+      const free = freeShippingThreshold != null && subtotal >= freeShippingThreshold
       const next: ShippingEstimate = {
         country: selectedCountry.label,
         region: region.trim(),
@@ -211,7 +212,7 @@ export function ShippingEstimator({
           </div>
           <p className="mt-1 text-xs text-zinc-500">
             {estimate.method === "Free shipping"
-              ? `Free shipping unlocked — you went over ${formatMoney(freeShippingThreshold, currency)}.`
+              ? `Free shipping unlocked — you went over ${formatMoney(freeShippingThreshold ?? 0, currency)}.`
               : `Estimated for ${estimate.city}, ${estimate.region} (${estimate.country}). Delivers in ${estimate.eta}.`}
           </p>
         </div>
@@ -219,7 +220,7 @@ export function ShippingEstimator({
 
       {!estimate && canCalculate && !isCalculating && (
         <p className="mt-4 text-xs text-zinc-400">
-          {subtotal >= freeShippingThreshold
+          {freeShippingThreshold != null && subtotal >= freeShippingThreshold
             ? `Orders over ${formatMoney(freeShippingThreshold, currency)} ship free.`
             : `Standard shipping to ${selectedCountry?.label ?? "your region"} starts at ${formatMoney(selectedCountry?.rate ?? 0, currency)}.`}
         </p>

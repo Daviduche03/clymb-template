@@ -42,7 +42,6 @@ export function HeaderCeo({
       <div className="border-b border-zinc-200 bg-zinc-950">
         <div className="mx-auto flex h-9 max-w-[90rem] items-center justify-between px-4 text-[0.65rem] uppercase tracking-[0.24em] text-zinc-300 sm:px-6 lg:px-10">
           <span data-edit-field="header.storeName">{tagline}</span>
-          <span className="hidden sm:inline">Free shipping over $50</span>
         </div>
       </div>
 
